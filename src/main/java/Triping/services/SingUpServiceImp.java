@@ -1,4 +1,4 @@
-package Triping.service;
+package Triping.services;
 
 import Triping.models.User;
 import Triping.repositories.UserRepository;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class SingInServiceImp implements SignInService {
+public class SingUpServiceImp implements SignUpService {
     @Autowired
     private UserRepository userRepository;
 

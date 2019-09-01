@@ -1,6 +1,6 @@
 package Triping.controllers;
 
-import Triping.service.LoginService;
+import Triping.services.LoginService;
 import Triping.utils.exceptions.HashingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;

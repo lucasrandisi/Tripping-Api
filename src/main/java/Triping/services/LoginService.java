@@ -1,4 +1,4 @@
-package Triping.service;
+package Triping.services;
 
 import Triping.utils.exceptions.HashingException;
 

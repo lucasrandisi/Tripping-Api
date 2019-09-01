@@ -1,7 +1,7 @@
-package Triping.service;
+package Triping.services;
 
 import Triping.utils.exceptions.HashingException;
 
-public interface SignInService {
+public interface SignUpService {
     void registerUser(String username, String Password) throws HashingException;
 }
