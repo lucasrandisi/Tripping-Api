@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 
 @Controller
-@RequestMapping(path="/logIn")
+@RequestMapping(path="/login")
 public class LogInController {
     @Autowired
     private LoginService loginServiceImp;
