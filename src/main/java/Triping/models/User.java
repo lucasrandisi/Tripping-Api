@@ -15,8 +15,6 @@ public class User {
     private String password;
     private String email;
     private byte[] userImage;
-
-    //Todo: sal no deberia estar en cada usuario
     private String salt;
 
     public User(){

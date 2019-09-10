@@ -2,7 +2,6 @@ package Triping.controllers;
 
 import Triping.models.User;
 import Triping.services.IUserService;
-import Triping.services.SignUpService;
 
 import Triping.utils.exceptions.HashingException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,25 +9,21 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.web.bind.annotation.*;
 
 import com.google.gson.Gson;
-import javax.validation.Valid;
-import java.io.IOException;
 
 @RestController
-
+@CrossOrigin
 public class RegistrationController {
-    @Autowired
-    private SignUpService signUpService;
 
+    @Autowired
     private IUserService userService;
 
     @Autowired //Triggers async execution of tasks
     ApplicationEventPublisher eventPublisher;
 
-
     //Registration
     @PostMapping(path="/register")
-    @ResponseBody
-    public String registerUserAccount(@RequestParam("data") String data) {
+    //@ResponseStatus(HttpStatus.CREATED)
+    public String registerUserAccount(@RequestBody String data) {
 
         /*Json to UserDto mapping*/
         Gson gson = new Gson();
@@ -38,6 +33,8 @@ public class RegistrationController {
             final User registered = userService.registerNewUserAccount(accountDto);
         } catch (HashingException e) {
             e.printStackTrace();
+        } catch (Exception e){
+            return(e.getMessage());
         }
         //Todo: Enviar token de validacion de email
         return ("success");
