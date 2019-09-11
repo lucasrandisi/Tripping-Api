@@ -28,6 +28,13 @@
 			<scope>test</scope>
 		</dependency>
 
+		<!-- Spring DevTools -->
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-devtools</artifactId>
+			<optional>true</optional>
+		</dependency>
+
 		<!-- JSON -->
 		<dependency>
 			<groupId>com.jayway.jsonpath</groupId>
