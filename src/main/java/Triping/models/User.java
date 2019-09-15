@@ -1,6 +1,7 @@
 package Triping.models;
 
 import javax.persistence.*;
+import java.util.*;
 
 @Entity
 public class User {
@@ -16,6 +17,33 @@ public class User {
     private String email;
     private byte[] userImage;
     private String salt;
+
+    @OneToMany
+    private List<User> friends;
+
+    @OneToMany(mappedBy = "ownedTrips")
+    private List<Trip> ownedTrips;
+
+    @OneToMany
+    private List<Itinerary> ownedItineraries;
+
+    @OneToMany
+    private List<Marker> customMarkers;
+
+    @ManyToMany
+    @JoinTable(name = "users_interests", joinColumns = @JoinColumn(name = "interest_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private Set<Interest> interests;
+
+    @OneToMany(mappedBy = "user")
+    private Set<TripParty> tripParties;
+
+    @ManyToMany
+    @JoinTable(name = "saved_markers", joinColumns = @JoinColumn(name = "marker_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<Marker> savedMarkers;
+
+    @ManyToMany
+    @JoinTable(name = "saved_trips", joinColumns = @JoinColumn(name = "trip_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    private List<Marker> savedTrips;
 
     public User(){
         super();
@@ -53,4 +81,12 @@ public class User {
     public String getEmail() {return email; }
 
     public void setEmail(String email) {this.email = email;}
+
+    public boolean isEnabled() { return enabled; }
+
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
+
+    public List<User> getFriends() { return friends; }
+
+    public void setFriends(List<User> friends) { this.friends = friends;}
 }
