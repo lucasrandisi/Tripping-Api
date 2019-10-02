@@ -1,31 +1,33 @@
 package Triping.models;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 @Entity
-public class TripParty {
-
-    @EmbeddedId
-    private TripPartyKey id;
-
+public class TripParty implements Serializable {
+    @Id
     @ManyToOne
-    @MapsId("trip_id")
-    @JoinColumn(name = "trip_id")
+    @JoinColumn
     private User user;
 
+    @Id
     @ManyToOne
-    @MapsId("trip_id")
-    @JoinColumn(name = "trip_id")
+    @JoinColumn
     private Trip trip;
 
-    enum PartyPermission {EDIT, COMMENT, SEE };
+    enum PartyPermission {EDIT, COMMENT, SEE }
     private PartyPermission role;
+    private boolean invitationConfirmationPending;
 
-    public TripPartyKey getId() { return id; }
-
-    public void setId(TripPartyKey id) { this.id = id; }
+    public TripParty(){
+        this.invitationConfirmationPending = true;
+    }
 
     public PartyPermission getRole() { return role;}
 
     public void setRole(PartyPermission role) { this.role = role; }
+
+    public boolean isPendingConfirmationInvitation() { return invitationConfirmationPending;}
+
+    public void setPendingConfirmationInvitation(boolean invitationConfirmationPending) { this.invitationConfirmationPending = invitationConfirmationPending;}
 }

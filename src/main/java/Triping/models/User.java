@@ -21,7 +21,7 @@ public class User {
     @OneToMany
     private List<User> friends;
 
-    @OneToMany(mappedBy = "ownedTrips")
+    @OneToMany
     private List<Trip> ownedTrips;
 
     @OneToMany
@@ -32,7 +32,7 @@ public class User {
 
     @ManyToMany
     @JoinTable(name = "users_interests", joinColumns = @JoinColumn(name = "interest_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<Interest> interests;
+    private Set<Interest> userInterests;
 
     @OneToMany(mappedBy = "user")
     private Set<TripParty> tripParties;

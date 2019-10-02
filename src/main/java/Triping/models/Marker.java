@@ -23,10 +23,10 @@ public class Marker {
 
     @ManyToMany
     @JoinTable(name = "markers_interests", joinColumns = @JoinColumn(name = "interest_id"), inverseJoinColumns = @JoinColumn(name = "marker_id"))
-    private Set<Interest> relatedInterests;
+    private Set<Interest> markerInterests;
 
-    @ManyToMany(mappedBy = "itineraries_markers")
-    private List<Itinerary> itineraries;
+    @OneToMany(mappedBy = "marker")
+    private List<ItineraryMarkers> itineraries;
 
     public Long getId() { return id; }
 
@@ -48,7 +48,7 @@ public class Marker {
 
     public void setLongitude(float longitude) { this.longitude = longitude; }
 
-    public Set<Interest> getRelatedInterests() { return relatedInterests; }
+    public Set<Interest> getRelatedInterests() { return markerInterests; }
 
-    public void setRelatedInterests(Set<Interest> relatedInterests) { this.relatedInterests = relatedInterests; }
+    public void setRelatedInterests(Set<Interest> markerInterests) { this.markerInterests = markerInterests; }
 }

@@ -1,31 +1,24 @@
 package Triping.models;
 
 import javax.persistence.*;
+import java.io.Serializable;
 import java.sql.Time;
 
 @Entity
-public class ItineraryMarkers {
-
-    @EmbeddedId
-    private ItineraryMarkersKey id;
+public class ItineraryMarkers implements Serializable {
 
     //ToDo: Implementar comentarios de usuarios
-
+    @Id
     @ManyToOne
-    @MapsId("itinerary_id")
-    @JoinColumn(name = "itinerary_id")
+    @JoinColumn
     private Itinerary itinerary;
 
+    @Id
     @ManyToOne
-    @MapsId("marker_id")
-    @JoinColumn(name = "marker_id")
+    @JoinColumn
     private Marker marker;
 
     private Time startTime;
-
-    public ItineraryMarkersKey getId() { return id; }
-
-    public void setId(ItineraryMarkersKey id) { this.id = id; }
 
     public Time getStartTime() { return startTime; }
 

@@ -5,6 +5,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.sql.Date;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -19,7 +20,7 @@ public class Trip {
 
     @ManyToMany
     @JoinTable(name = "trips_itineraries", joinColumns = @JoinColumn(name = "itinerary_id"), inverseJoinColumns = @JoinColumn(name = "trip_id"))
-    private ArrayList<Itinerary> itineraries;
+    private List<Itinerary> itineraries;
 
     @OneToMany(mappedBy = "trip")
     private Set<TripParty> contributingUsers;
@@ -49,9 +50,9 @@ public class Trip {
 
     public void setEndDate(Date endDate) { this.endDate = endDate; }
 
-    public ArrayList<Itinerary> getItineraries() { return itineraries; }
+    public List<Itinerary> getItineraries() { return itineraries; }
 
-    public void setItineraries(ArrayList<Itinerary> itineraries) { this.itineraries = itineraries; }
+    public void setItineraries(List<Itinerary> itineraries) { this.itineraries = itineraries; }
 
     public Set<TripParty> getContributingUsers() { return contributingUsers; }
 

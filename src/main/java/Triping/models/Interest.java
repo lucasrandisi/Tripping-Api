@@ -12,10 +12,10 @@ public class Interest {
 
     private String description;
 
-    @ManyToMany(mappedBy = "users_interests")
+    @ManyToMany(mappedBy = "userInterests")
     private Set<User> users;
 
-    @ManyToMany(mappedBy = "markers_interests")
+    @ManyToMany(mappedBy = "markerInterests")
     private Set<Marker> markers;
 
     public int getId() { return id; }
