@@ -2,13 +2,16 @@ package Triping.controllers;
 
 import Triping.models.User;
 import Triping.services.IUserService;
-
+import Triping.utils.GenericResponse;
+import Triping.utils.exceptions.NotImplementedException;
 import Triping.utils.exceptions.HashingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 import com.google.gson.Gson;
+
 
 @RestController
 @CrossOrigin
@@ -21,9 +24,9 @@ public class RegistrationController {
     ApplicationEventPublisher eventPublisher;
 
     //Registration
-    @PostMapping(path="/register")
+    @PostMapping(path="/user/register")
     //@ResponseStatus(HttpStatus.CREATED)
-    public String registerUserAccount(@RequestBody String data) {
+    public GenericResponse registerUserAccount(@RequestBody String data) {
 
         /*Json to UserDto mapping*/
         Gson gson = new Gson();
@@ -34,9 +37,32 @@ public class RegistrationController {
         } catch (HashingException e) {
             e.printStackTrace();
         } catch (Exception e){
-            return(e.getMessage());
+            return new GenericResponse(e.getMessage());
         }
         //Todo: Enviar token de validacion de email
-        return ("success");
+        return new GenericResponse("success");
+    }
+
+    /*  When the user clicks on the verification link, the verification token is purged and the account is activated
+     */
+    @GetMapping(path="/registrationConfirm")
+    public ResponseEntity<?> confirmRegistration(){
+        throw new NotImplementedException();
+    }
+
+    @RequestMapping(value = "/user/resendRegistrationToken")
+    @ResponseBody
+    public GenericResponse resendRegistrationToken(){
+        throw new NotImplementedException();
+    }
+
+    @PostMapping(path="/user/resetPassword")
+    public GenericResponse resetPassword(){
+        throw new NotImplementedException();
+    }
+
+    @PostMapping(path="/user/changePassword")
+    public GenericResponse changePassword(){
+        throw new NotImplementedException();
     }
 }
