@@ -8,9 +8,13 @@ import Triping.utils.exceptions.HashingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.google.gson.Gson;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import javax.validation.Valid;
+import java.net.URI;
 
 
 @RestController
@@ -25,22 +29,18 @@ public class RegistrationController {
 
     //Registration
     @PostMapping(path="/user/register")
-    //@ResponseStatus(HttpStatus.CREATED)
-    public GenericResponse registerUserAccount(@RequestBody String data) {
-
-        /*Json to UserDto mapping*/
-        Gson gson = new Gson();
-        UserDto accountDto = gson.fromJson(data, UserDto.class);
-
+    public ResponseEntity<?> registerUserAccount(@Valid @RequestBody UserDto accountDto) {
         try {
             final User registered = userService.registerNewUserAccount(accountDto);
-        } catch (HashingException e) {
-            e.printStackTrace();
+            //Todo: Enviar token de validacion de email
+
+            URI location = ServletUriComponentsBuilder.fromPath("user/{username}")
+                    .buildAndExpand(registered.getUsername()).toUri();
+
+            return ResponseEntity.created(location).build();
         } catch (Exception e){
-            return new GenericResponse(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
-        //Todo: Enviar token de validacion de email
-        return new GenericResponse("success");
     }
 
     /*  When the user clicks on the verification link, the verification token is purged and the account is activated
