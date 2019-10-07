@@ -49,6 +49,15 @@ public class UserService implements IUserService{
         return (userRepository.save(user));
     }
 
+    public boolean validateUserCredentials(String username, String passwordToCheck) throws HashingException {
+        User user = userRepository.findByUsername(username);
+
+        Optional<String> optHashedPassword = Hashing.hashPassword(passwordToCheck, user.getSalt());
+        String hashedPassword = optHashedPassword.orElseThrow(HashingException::new);
+
+        return hashedPassword.equals(user.getPassword());
+    }
+
     @Override
     public User findUserByEmail(final String email) {
         return userRepository.findByEmail(email);

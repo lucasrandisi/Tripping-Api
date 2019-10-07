@@ -18,8 +18,10 @@ import javax.validation.Payload;
 @Target({ TYPE, FIELD, ANNOTATION_TYPE })
 @Retention(RUNTIME)
 public @interface ValidPassword {
-
+    // Error message
     String message() default "Invalid Password";
+
+    // Boilerplate code to conforms to the Spring standards
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 
