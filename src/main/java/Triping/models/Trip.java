@@ -1,6 +1,6 @@
 package Triping.models;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import Triping.utils.exceptions.NotImplementedException;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -24,6 +24,10 @@ public class Trip {
 
     @OneToMany(mappedBy = "trip")
     private Set<TripParty> contributingUsers;
+
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private User user;
 
     public Trip(){
         this.accessibility = true;

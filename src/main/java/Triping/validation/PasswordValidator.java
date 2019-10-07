@@ -11,6 +11,7 @@ public class PasswordValidator implements ConstraintValidator<ValidPassword, Str
       private Matcher matcher;
       private static final String PASSWORD_PATTERN = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\\$%?\\^&\\*])(?=.{8,})/";
 
+      // This method is guaranteed to be called before any use of this instance for validation
       @Override
       public void initialize(ValidPassword constraint) {
       }
