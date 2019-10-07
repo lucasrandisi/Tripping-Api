@@ -1,6 +1,6 @@
 package Triping.models;
 
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+import Triping.utils.exceptions.NotImplementedException;
 
 import javax.persistence.*;
 import java.util.ArrayList;

@@ -21,7 +21,7 @@ public class User {
     @OneToMany
     private List<User> friends;
 
-    @OneToMany
+    @OneToMany(mappedBy = "user")
     private List<Trip> ownedTrips;
 
     @OneToMany
