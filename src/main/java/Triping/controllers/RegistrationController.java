@@ -1,10 +1,10 @@
 package Triping.controllers;
 
 import Triping.models.User;
+import Triping.models.VerificationToken;
 import Triping.services.IUserService;
 import Triping.utils.GenericResponse;
 import Triping.utils.exceptions.NotImplementedException;
-import Triping.utils.exceptions.HashingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -24,10 +24,14 @@ public class RegistrationController {
     @Autowired
     private IUserService userService;
 
-    @Autowired //Triggers async execution of tasks
+    @Autowired //Triggers async execution of backend tasks
     ApplicationEventPublisher eventPublisher;
 
-    //Registration
+    /**
+     *Registration of new account
+     * @param accountDto
+     * @return The URL of created user
+     */
     @PostMapping(path="/user/register")
     public ResponseEntity<?> registerUserAccount(@Valid @RequestBody UserDto accountDto) {
         try {
@@ -43,11 +47,26 @@ public class RegistrationController {
         }
     }
 
-    /*  When the user clicks on the verification link, the verification token is purged and the account is activated
+    /**
+     *  When user clicks on the verification link, the account is activated
+     * @param token Unique verification token for the account
+     * @return Http.OK if account was verified, Http.BAD_REQUEST if invalid or expired
      */
-    @GetMapping(path="/registrationConfirm")
-    public ResponseEntity<?> confirmRegistration(){
-        throw new NotImplementedException();
+    @GetMapping(path="/verify")
+    public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token){
+
+        VerificationToken verificationToken = userService.getVerificationToken(token);
+        if (verificationToken == null) {
+            return new ResponseEntity<>("Invalid token", HttpStatus.BAD_REQUEST);
+        }
+        if(verificationToken.isExpired()){
+            return new ResponseEntity<>("Expired token", HttpStatus.BAD_REQUEST);
+        }
+        User user = verificationToken.getUser();
+        user.setEnabled(true);
+        userService.saveUser(user);
+        //ToDo: Logear usuario y redirigir a inicio
+        return new ResponseEntity<>("User account has been activated", HttpStatus.OK);
     }
 
     @RequestMapping(value = "/user/resendRegistrationToken")

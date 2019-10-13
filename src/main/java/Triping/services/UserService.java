@@ -2,21 +2,28 @@ package Triping.services;
 
 import Triping.controllers.UserDto;
 import Triping.models.User;
+import Triping.models.VerificationToken;
 import Triping.repositories.UserRepository;
+import Triping.repositories.VerificationTokenRepository;
 import Triping.utils.Hashing;
 import Triping.utils.exceptions.HashingException;
 import Triping.utils.exceptions.UserAlreadyExistException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserService implements IUserService{
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private VerificationTokenRepository tokenRepository;
 
     private final int SALT_LENGTH = 4;
 
@@ -61,5 +68,15 @@ public class UserService implements IUserService{
     @Override
     public User findUserByEmail(final String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public VerificationToken getVerificationToken(String verificationToken) {
+        return tokenRepository.findByToken(verificationToken);
+    }
+
+    @Override
+    public User saveUser(User user) {
+        return userRepository.save(user);
     }
 }

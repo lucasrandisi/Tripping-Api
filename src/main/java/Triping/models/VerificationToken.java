@@ -45,6 +45,11 @@ public class VerificationToken {
         return new Date(cal.getTime().getTime());
     }
 
+    public boolean isExpired() {
+        Calendar cal = Calendar.getInstance();
+        return (expiryDate.getTime() - cal.getTime().getTime()) <= 0;
+    }
+
     public String getToken() {
         return token;
     }
