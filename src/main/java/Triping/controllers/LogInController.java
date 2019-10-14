@@ -1,15 +1,18 @@
 package Triping.controllers;
 
 import Triping.services.IUserService;
-import Triping.utils.exceptions.HashingException;
+import Triping.utils.GenericResponse;
 
 import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+
 
 
 @Controller
@@ -18,8 +21,9 @@ public class LogInController {
     @Autowired
     private IUserService userService;
 
+
     @PostMapping
-    public @ResponseBody String login(@RequestBody String data, HttpServletRequest request) {
+    public @ResponseBody GenericResponse login(@RequestBody String data, HttpServletRequest req) {
         Gson gson = new Gson();
         UserDto userDto = gson.fromJson(data, UserDto.class);
 
@@ -27,17 +31,19 @@ public class LogInController {
         String password = userDto.getPassword();
 
         try {
-            if( userService.validateUserCredentials(username, password) ){
-                HttpSession session = request.getSession();
-                session.setAttribute("logged", true);
-                return "Usuario encontrado";
+            if (userService.validatePassword(username, password)){
+                Authentication authentication =  new UsernamePasswordAuthenticationToken(username, null, null);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                return new GenericResponse("Usuario loggeado");
             }
             else{
-                return "Ni idea ese sujeto";
+                return new GenericResponse("Ni idea ese sujeto");
             }
-        } catch (HashingException e) {
-            return "Error al intentar iniciar sesion";
+        } catch (Exception e) {
+            return new GenericResponse("Ocurrió un error");
         }
+
     }
 
 }

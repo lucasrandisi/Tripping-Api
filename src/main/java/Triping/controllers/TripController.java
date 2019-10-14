@@ -16,6 +16,11 @@ public class TripController {
     private ITripService tripService;
     */
 
+    @GetMapping(path="/user/trips")
+    public String userTrips(){
+        return "Mis viajes";
+    }
+
     @PostMapping(path="/trip/new")
     public GenericResponse createNewTrip(){
         throw new NotImplementedException();

@@ -1,10 +1,8 @@
 package Triping.controllers;
 
-import Triping.models.User;
 import Triping.services.IUserService;
 import Triping.utils.GenericResponse;
 import Triping.utils.exceptions.NotImplementedException;
-import Triping.utils.exceptions.HashingException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -33,14 +31,15 @@ public class RegistrationController {
         UserDto accountDto = gson.fromJson(data, UserDto.class);
 
         try {
-            final User registered = userService.registerNewUserAccount(accountDto);
-        } catch (HashingException e) {
-            e.printStackTrace();
-        } catch (Exception e){
+            userService.registerNewUserAccount(accountDto);
+
+            //Todo: Enviar token de validacion de email
+            return new GenericResponse("success");
+        }
+        catch (Exception e){
             return new GenericResponse(e.getMessage());
         }
-        //Todo: Enviar token de validacion de email
-        return new GenericResponse("success");
+
     }
 
     /*  When the user clicks on the verification link, the verification token is purged and the account is activated
