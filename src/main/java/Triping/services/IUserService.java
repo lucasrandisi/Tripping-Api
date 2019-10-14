@@ -14,6 +14,8 @@ public interface IUserService {
 
     User findUserByEmail(final String email);
 
+    User findUserByUsername(final String username);
+
     VerificationToken getVerificationToken(String token);
 
     User saveUser(User user);

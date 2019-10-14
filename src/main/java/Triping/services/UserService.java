@@ -34,6 +34,10 @@ public class UserService implements IUserService{
             throw new UserAlreadyExistException("Ya existe una cuenta registrada con " + accountDto.getEmail());
         }
 
+        if (this.findUserByUsername(accountDto.getUsername()) != null) {
+            throw new UserAlreadyExistException("Ya existe una cuenta registrada con nombre de usuario " + accountDto.getUsername());
+        }
+
         //Create new user account deactivated
         final User user = new User();
         user.setUsername(accountDto.getUsername());
@@ -68,6 +72,11 @@ public class UserService implements IUserService{
     @Override
     public User findUserByEmail(final String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
     @Override

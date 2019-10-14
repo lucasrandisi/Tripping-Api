@@ -1,5 +1,7 @@
 package Triping.models;
 
+import org.hibernate.annotations.NaturalId;
+
 import javax.persistence.*;
 import java.util.*;
 
@@ -9,10 +11,11 @@ public class User {
     @GeneratedValue(strategy=GenerationType.AUTO)
     private Long id;
 
-    @Column(name = "enabled")
-    private boolean enabled;
-
+    @NaturalId
+    @Column(unique = true)
     private String username;
+
+    private boolean enabled;
     private String password;
     private String email;
     private byte[] userImage;
