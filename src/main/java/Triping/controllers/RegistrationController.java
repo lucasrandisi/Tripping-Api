@@ -3,6 +3,7 @@ package Triping.controllers;
 import Triping.models.User;
 import Triping.models.VerificationToken;
 import Triping.services.IUserService;
+import Triping.tasks.OnRegistrationCompleteEvent;
 import Triping.utils.GenericResponse;
 import Triping.utils.exceptions.NotImplementedException;
 
@@ -16,7 +17,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import javax.validation.Valid;
 import java.net.URI;
 
-
 @RestController
 @CrossOrigin
 public class RegistrationController {
@@ -25,7 +25,7 @@ public class RegistrationController {
     private IUserService userService;
 
     @Autowired //Triggers async execution of backend tasks
-    ApplicationEventPublisher eventPublisher;
+    private ApplicationEventPublisher eventPublisher;
 
     /**
      *Registration of new account
@@ -36,7 +36,10 @@ public class RegistrationController {
     public ResponseEntity<?> registerUserAccount(@Valid @RequestBody UserDto accountDto) {
         try {
             final User registered = userService.registerNewUserAccount(accountDto);
-            //Todo: Enviar token de validacion de email
+
+            // Create confirmation token and send confirmation email
+            String appUrl = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
+            eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered, appUrl));
 
             URI location = ServletUriComponentsBuilder.fromPath("user/{username}")
                     .buildAndExpand(registered.getUsername()).toUri();

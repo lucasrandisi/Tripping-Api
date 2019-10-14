@@ -79,4 +79,10 @@ public class UserService implements IUserService{
     public User saveUser(User user) {
         return userRepository.save(user);
     }
+
+    @Override
+    public void createVerificationToken(final User user, final String token) {
+        VerificationToken verificationToken = new VerificationToken(user, token);
+        tokenRepository.save(verificationToken);
+    }
 }

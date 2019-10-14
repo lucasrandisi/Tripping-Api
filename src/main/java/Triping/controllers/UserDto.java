@@ -3,7 +3,6 @@ package Triping.controllers;
 import Triping.validation.PasswordMatches;
 import Triping.validation.ValidEmail;
 import Triping.validation.ValidPassword;
-import com.google.gson.annotations.SerializedName;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
@@ -17,7 +16,6 @@ public class UserDto implements Serializable {
     private String password;
 
     @NotNull @NotEmpty
-    @SerializedName("password_confirm")
     private String matchingPassword;
 
     @ValidEmail
