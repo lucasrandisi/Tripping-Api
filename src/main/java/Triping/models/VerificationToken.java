@@ -19,6 +19,10 @@ public class VerificationToken {
     private String token;
     private Date expiryDate;
 
+    public enum status {
+        INVALID, EXPIRED, VALID
+    }
+
     public VerificationToken() {
         super();
     }
@@ -30,12 +34,9 @@ public class VerificationToken {
         this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
-    public VerificationToken(final String token, final User user) {
-        super();
-
-        this.token = token;
+    public VerificationToken(final User user, final String token) {
+        this(token);
         this.user = user;
-        this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
     private Date calculateExpiryDate(int expiryTimeInMinutes) {

@@ -10,6 +10,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.util.UUID;
@@ -27,6 +28,7 @@ public class RegistrationListener {
     private Environment env;
 
     @EventListener
+    @Async
     public void confirmRegistration(OnRegistrationCompleteEvent event) {
         //Create and persist token
         User user = event.getUser();
