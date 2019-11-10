@@ -2,6 +2,7 @@ package Triping.services;
 
 import Triping.controllers.UserDto;
 import Triping.models.User;
+import Triping.models.VerificationToken;
 import Triping.utils.exceptions.HashingException;
 import Triping.utils.exceptions.UserAlreadyExistException;
 
@@ -12,4 +13,12 @@ public interface IUserService {
     boolean validateUserCredentials(String username, String password) throws HashingException;
 
     User findUserByEmail(final String email);
+
+    User findUserByUsername(final String username);
+
+    VerificationToken getVerificationToken(String token);
+
+    User saveUser(User user);
+
+    void createVerificationToken(User user, String token);
 }

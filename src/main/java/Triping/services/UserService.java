@@ -2,21 +2,28 @@ package Triping.services;
 
 import Triping.controllers.UserDto;
 import Triping.models.User;
+import Triping.models.VerificationToken;
 import Triping.repositories.UserRepository;
+import Triping.repositories.VerificationTokenRepository;
 import Triping.utils.Hashing;
 import Triping.utils.exceptions.HashingException;
 import Triping.utils.exceptions.UserAlreadyExistException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
 @Service
+@Transactional
 public class UserService implements IUserService{
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    private VerificationTokenRepository tokenRepository;
 
     private final int SALT_LENGTH = 4;
 
@@ -25,6 +32,10 @@ public class UserService implements IUserService{
     public User registerNewUserAccount(final UserDto accountDto) {
         if (this.findUserByEmail(accountDto.getEmail()) != null) {
             throw new UserAlreadyExistException("Ya existe una cuenta registrada con " + accountDto.getEmail());
+        }
+
+        if (this.findUserByUsername(accountDto.getUsername()) != null) {
+            throw new UserAlreadyExistException("Ya existe una cuenta registrada con nombre de usuario " + accountDto.getUsername());
         }
 
         //Create new user account deactivated
@@ -61,5 +72,26 @@ public class UserService implements IUserService{
     @Override
     public User findUserByEmail(final String email) {
         return userRepository.findByEmail(email);
+    }
+
+    @Override
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username);
+    }
+
+    @Override
+    public VerificationToken getVerificationToken(String verificationToken) {
+        return tokenRepository.findByToken(verificationToken);
+    }
+
+    @Override
+    public User saveUser(User user) {
+        return userRepository.save(user);
+    }
+
+    @Override
+    public void createVerificationToken(final User user, final String token) {
+        VerificationToken verificationToken = new VerificationToken(user, token);
+        tokenRepository.save(verificationToken);
     }
 }
