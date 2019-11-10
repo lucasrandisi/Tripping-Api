@@ -7,12 +7,11 @@ import java.util.Collection;
 import java.util.Collections;
 
 public class CustomUserDetails implements UserDetails {
-    private String username;
-    private String password;
+
+    private User authenticatedUser;
 
     public CustomUserDetails(User user){
-        this.setUsername(user.getUsername());
-        this.setPassword(user.getPassword());
+        this.authenticatedUser = user;
     }
 
     @Override
@@ -23,12 +22,12 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
-        return this.password;
+        return this.authenticatedUser.getPassword();
     }
 
     @Override
     public String getUsername() {
-        return this.username;
+        return this.authenticatedUser.getUsername();
     }
 
     @Override
@@ -49,13 +48,5 @@ public class CustomUserDetails implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

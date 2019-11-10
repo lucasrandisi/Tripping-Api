@@ -12,23 +12,20 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 
-
-@Controller
-@RequestMapping(path="/login")
+@RestController
+@RequestMapping(path="/auth")
 public class LogInController {
     @Autowired
     private IUserService userService;
 
 
     @PostMapping
-    public @ResponseBody GenericResponse login(@RequestBody String data, HttpServletRequest req) {
-        Gson gson = new Gson();
-        UserDto userDto = gson.fromJson(data, UserDto.class);
-
-        String username = userDto.getUsername();
-        String password = userDto.getPassword();
+    public @ResponseBody GenericResponse login(@Valid @RequestBody AuthDto authDto, HttpServletRequest req) {
+        String username = authDto.getUsername();
+        String password = authDto.getPassword();
 
         try {
             if (userService.validatePassword(username, password)){
