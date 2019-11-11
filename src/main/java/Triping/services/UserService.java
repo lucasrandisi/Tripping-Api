@@ -14,6 +14,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @Transactional
 public class UserService implements IUserService{
@@ -92,13 +94,32 @@ public class UserService implements IUserService{
     @Override
     public void followUser(User currentUser, String username) throws ResourceNotFoundException {
         User followedUser = userRepository.findByUsername(username);
-
         if(followedUser != null){
-            currentUser.getFriends().add(followedUser);
+            if(!currentUser.getFriends().contains(followedUser) && currentUser != followedUser){
+                currentUser.getFriends().add(followedUser);
+                userRepository.save(currentUser);
+            }else {
+                throw new ResourceNotFoundException();
+            }
 
-            userRepository.save(currentUser);
         }
         else{
+            throw new ResourceNotFoundException();
+        }
+    }
+
+    @Override
+    public void unfollowUser(User currentUser, String username) throws ResourceNotFoundException {
+        User toUnfollowUser = userRepository.findByUsername(username);
+        if(toUnfollowUser != null){
+            if(currentUser.getFriends().contains(toUnfollowUser) && currentUser != toUnfollowUser){
+                currentUser.getFriends().remove(toUnfollowUser);
+                userRepository.save(currentUser);
+            }else{
+                throw new ResourceNotFoundException();
+            }
+
+        }else{
             throw new ResourceNotFoundException();
         }
     }

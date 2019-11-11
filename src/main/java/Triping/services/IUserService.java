@@ -23,4 +23,6 @@ public interface IUserService {
     void createVerificationToken(User user, String token);
 
     void followUser(User currentUser, String username) throws ResourceNotFoundException;
+
+    void unfollowUser(User currentUser, String username) throws ResourceNotFoundException;
 }

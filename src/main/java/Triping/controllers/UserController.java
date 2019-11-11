@@ -31,7 +31,17 @@ public class UserController {
     }
 
     @DeleteMapping("/unfollow/{username}")
-    public void unfollowUser(@PathVariable String username){
+    public String unfollowUser(@PathVariable String username){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
+
+        try {
+            userService.unfollowUser(currentUser,username);
+            return "Unfollowed";
+        }
+        catch(ResourceNotFoundException e){
+            return e.getMessage();
+        }
 
     }
 
