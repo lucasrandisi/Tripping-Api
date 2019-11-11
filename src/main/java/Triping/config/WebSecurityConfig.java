@@ -1,6 +1,7 @@
 package Triping.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -15,7 +16,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 @EnableWebSecurity
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
-    UserDetailsService userDetailsService;
+    @Qualifier("userDetailsService")
+    private UserDetailsService userDetailsService;
 
 
     @Override
@@ -29,7 +31,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.antMatcher("/**")
             .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/login", "/user/register" ).permitAll()
+                .antMatchers(HttpMethod.POST, "/auth", "/user/register" ).permitAll()
                 .antMatchers("/").permitAll()
                 .anyRequest().authenticated()
             .and()

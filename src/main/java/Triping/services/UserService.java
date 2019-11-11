@@ -5,8 +5,7 @@ import Triping.models.User;
 import Triping.models.VerificationToken;
 import Triping.repositories.UserRepository;
 import Triping.repositories.VerificationTokenRepository;
-import Triping.utils.Hashing;
-import Triping.utils.exceptions.HashingException;
+import Triping.utils.exceptions.ResourceNotFoundException;
 import Triping.utils.exceptions.UserAlreadyExistException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,8 +13,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -90,5 +87,19 @@ public class UserService implements IUserService{
     public void createVerificationToken(final User user, final String token) {
         VerificationToken verificationToken = new VerificationToken(user, token);
         tokenRepository.save(verificationToken);
+    }
+
+    @Override
+    public void followUser(User currentUser, String username) throws ResourceNotFoundException {
+        User followedUser = userRepository.findByUsername(username);
+
+        if(followedUser != null){
+            currentUser.getFriends().add(followedUser);
+
+            userRepository.save(currentUser);
+        }
+        else{
+            throw new ResourceNotFoundException();
+        }
     }
 }
