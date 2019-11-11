@@ -1,33 +1,46 @@
 package Triping.controllers;
 
 import Triping.services.IUserService;
-import Triping.utils.exceptions.HashingException;
+import Triping.utils.GenericResponse;
 
+import com.google.gson.Gson;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-@Controller
-@RequestMapping(path="/login")
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
+
+@RestController
+@RequestMapping(path="/auth")
 public class LogInController {
     @Autowired
     private IUserService userService;
 
+
     @PostMapping
-    public @ResponseBody String login(@RequestParam(value="usr") String username, @RequestParam(value="pwd") String password) {
+    public @ResponseBody GenericResponse login(@Valid @RequestBody AuthDto authDto, HttpServletRequest req) {
+        String username = authDto.getUsername();
+        String password = authDto.getPassword();
+
         try {
-            if( userService.validateUserCredentials(username, password) ){
-                return "Usuario encontrado";
+            if (userService.validatePassword(username, password)){
+                Authentication authentication =  new UsernamePasswordAuthenticationToken(username, null, null);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                return new GenericResponse("Usuario loggeado");
             }
             else{
-                return "Ni idea ese sujeto";
+                return new GenericResponse("Ni idea ese sujeto");
             }
-        } catch (HashingException e) {
-            return "Error al intentar iniciar sesion";
+        } catch (Exception e) {
+            return new GenericResponse("Ocurrió un error");
         }
+
     }
 
 }

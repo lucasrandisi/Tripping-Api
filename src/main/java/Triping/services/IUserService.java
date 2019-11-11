@@ -10,7 +10,7 @@ public interface IUserService {
 
     User registerNewUserAccount(UserDto accountDto) throws UserAlreadyExistException, HashingException;
 
-    boolean validateUserCredentials(String username, String password) throws HashingException;
+    boolean validatePassword(String username, String password);
 
     User findUserByEmail(final String email);
 

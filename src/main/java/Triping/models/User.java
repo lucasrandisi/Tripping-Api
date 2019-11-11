@@ -49,9 +49,9 @@ public class User {
     private List<Marker> savedTrips;
 
     public User(){
-        super();
         this.enabled = false;
     }
+
 
     public Long getId() { return id; }
 

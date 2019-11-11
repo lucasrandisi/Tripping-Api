@@ -10,6 +10,8 @@ import Triping.utils.exceptions.HashingException;
 import Triping.utils.exceptions.UserAlreadyExistException;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,7 +27,6 @@ public class UserService implements IUserService{
     @Autowired
     private VerificationTokenRepository tokenRepository;
 
-    private final int SALT_LENGTH = 4;
 
     /* ~~~~~~~~~~ API SERVICES ~~~~~~~~~~~~~ */
     @Override
@@ -43,31 +44,27 @@ public class UserService implements IUserService{
         user.setUsername(accountDto.getUsername());
         user.setEmail(accountDto.getEmail());
 
-        //Password Hashing
-        try{
-            Optional<String> optSalt = Hashing.generateSalt(SALT_LENGTH);
-            String salt = optSalt.orElseThrow(HashingException::new);
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        String hashedPassword = passwordEncoder.encode(accountDto.getPassword());
 
-            Optional<String> optHashedPassword = Hashing.hashPassword(accountDto.getPassword(), salt);
-            String hashedPassword = optHashedPassword.orElseThrow(HashingException::new);
+        user.setPassword(hashedPassword);
 
-            user.setPassword(hashedPassword);
-            user.setSalt(salt);
-
-        } catch(HashingException e){
-            e.printStackTrace();
-        }
         return (userRepository.save(user));
     }
 
-    public boolean validateUserCredentials(String username, String passwordToCheck) throws HashingException {
+
+    public boolean validatePassword(String username, String password){
         User user = userRepository.findByUsername(username);
+        if (user == null){
+            return false;
+        }
 
-        Optional<String> optHashedPassword = Hashing.hashPassword(passwordToCheck, user.getSalt());
-        String hashedPassword = optHashedPassword.orElseThrow(HashingException::new);
+        String hashedPassword = user.getPassword();
 
-        return hashedPassword.equals(user.getPassword());
+        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+        return passwordEncoder.matches(password, hashedPassword);
     }
+
 
     @Override
     public User findUserByEmail(final String email) {
