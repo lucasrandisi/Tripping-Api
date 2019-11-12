@@ -15,7 +15,7 @@ public class User {
     @Column(unique = true)
     private String username;
 
-    private boolean enabled;
+    private Boolean enabled;
     private String password;
     private String email;
     private byte[] userImage;

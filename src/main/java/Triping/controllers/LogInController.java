@@ -1,5 +1,6 @@
 package Triping.controllers;
 
+import Triping.dto.AuthDto;
 import Triping.services.IUserService;
 import Triping.utils.GenericResponse;
 

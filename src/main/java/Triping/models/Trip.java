@@ -1,12 +1,19 @@
 package Triping.models;
 
-import Triping.utils.exceptions.NotImplementedException;
-
-import javax.persistence.*;
-import java.util.ArrayList;
 import java.sql.Date;
 import java.util.List;
 import java.util.Set;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+
+import Triping.utils.exceptions.NotImplementedException;
 
 @Entity
 public class Trip {
@@ -14,7 +21,7 @@ public class Trip {
     @Id @GeneratedValue
     private Long id;
 
-    private boolean accessibility;
+    private Boolean accessibility;
     private Date departureDate;
     private Date endDate;
 

@@ -1,4 +1,4 @@
-package Triping.controllers;
+package Triping.dto;
 
 
 import javax.validation.constraints.NotEmpty;

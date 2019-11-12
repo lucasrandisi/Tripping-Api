@@ -16,10 +16,10 @@ public class Marker {
     private String address;
 
     @Column(name = "lat", nullable = false)
-    private float latitude;
+    private Double latitude;
 
     @Column(name = "lng", nullable = false)
-    private float longitude;
+    private Double longitude;
 
     @ManyToMany
     @JoinTable(name = "markers_interests", joinColumns = @JoinColumn(name = "interest_id"), inverseJoinColumns = @JoinColumn(name = "marker_id"))
@@ -40,13 +40,13 @@ public class Marker {
 
     public void setAddress(String address) { this.address = address; }
 
-    public float getLatitude() { return latitude; }
+    public Double getLatitude() { return latitude; }
 
-    public void setLatitude(float latitude) { this.latitude = latitude; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
 
-    public float getLongitude() { return longitude; }
+    public Double getLongitude() { return longitude; }
 
-    public void setLongitude(float longitude) { this.longitude = longitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
 
     public Set<Interest> getRelatedInterests() { return markerInterests; }
 

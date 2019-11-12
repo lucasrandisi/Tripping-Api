@@ -1,5 +1,6 @@
 package Triping.controllers;
 
+import Triping.dto.AccountDto;
 import Triping.models.User;
 import Triping.models.VerificationToken;
 import Triping.services.IUserService;
@@ -33,7 +34,7 @@ public class RegistrationController {
      * @return The URL of created user
      */
     @PostMapping(path="/user/register")
-    public ResponseEntity<?> registerUserAccount(@Valid @RequestBody UserDto accountDto) {
+    public ResponseEntity<?> registerUserAccount(@Valid @RequestBody AccountDto accountDto) {
         try {
             final User registered = userService.registerNewUserAccount(accountDto);
 

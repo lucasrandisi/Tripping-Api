@@ -1,4 +1,4 @@
-package Triping.controllers;
+package Triping.dto;
 
 import Triping.validation.PasswordMatches;
 import Triping.validation.ValidEmail;
@@ -9,7 +9,7 @@ import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 @PasswordMatches
-public class UserDto implements Serializable {
+public class AccountDto implements Serializable {
 
     @ValidPassword
     @NotNull @NotEmpty

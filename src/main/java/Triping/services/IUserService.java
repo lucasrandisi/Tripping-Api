@@ -1,6 +1,6 @@
 package Triping.services;
 
-import Triping.controllers.UserDto;
+import Triping.dto.AccountDto;
 import Triping.models.User;
 import Triping.models.VerificationToken;
 import Triping.utils.exceptions.ResourceNotFoundException;
@@ -8,7 +8,7 @@ import Triping.utils.exceptions.UserAlreadyExistException;
 
 public interface IUserService {
 
-    User registerNewUserAccount(UserDto accountDto) throws UserAlreadyExistException, ResourceNotFoundException;
+    User registerNewUserAccount(AccountDto accountDto) throws UserAlreadyExistException, ResourceNotFoundException;
 
     boolean validatePassword(String username, String password);
 

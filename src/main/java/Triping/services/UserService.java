@@ -1,6 +1,6 @@
 package Triping.services;
 
-import Triping.controllers.UserDto;
+import Triping.dto.AccountDto;
 import Triping.models.User;
 import Triping.models.VerificationToken;
 import Triping.repositories.UserRepository;
@@ -29,7 +29,7 @@ public class UserService implements IUserService{
 
     /* ~~~~~~~~~~ API SERVICES ~~~~~~~~~~~~~ */
     @Override
-    public User registerNewUserAccount(final UserDto accountDto) {
+    public User registerNewUserAccount(final AccountDto accountDto) {
         if (this.findUserByEmail(accountDto.getEmail()) != null) {
             throw new UserAlreadyExistException("Ya existe una cuenta registrada con " + accountDto.getEmail());
         }
