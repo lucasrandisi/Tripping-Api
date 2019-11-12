@@ -21,6 +21,8 @@ public class Trip {
     @Id @GeneratedValue
     private Long id;
 
+    private String title;
+    private String description;
     private Boolean accessibility;
     private Date departureDate;
     private Date endDate;
@@ -34,7 +36,7 @@ public class Trip {
 
     @ManyToOne
     @JoinColumn(name="user_id")
-    private User user;
+    private User owner;
 
     public Trip(){
         this.accessibility = true;
@@ -68,4 +70,36 @@ public class Trip {
     public Set<TripParty> getContributingUsers() { return contributingUsers; }
 
     public void setContributingUsers(Set<TripParty> contributingUsers) { this.contributingUsers = contributingUsers; }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Boolean getAccessibility() {
+        return accessibility;
+    }
+
+    public void setAccessibility(Boolean accessibility) {
+        this.accessibility = accessibility;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User user) {
+        this.owner = user;
+    }
 }
