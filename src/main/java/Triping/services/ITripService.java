@@ -1,6 +1,7 @@
 package Triping.services;
 
 import Triping.models.Trip;
+import Triping.models.TripParty;
 import Triping.models.User;
 import Triping.utils.exceptions.ResourceNotFoundException;
 
@@ -17,4 +18,8 @@ public interface ITripService {
     Trip updateTrip(Long id, Trip tripDetails, User authenticatedUser) throws ResourceNotFoundException;
 
     void deleteTrip(Long id, User authenticatedUser) throws ResourceNotFoundException;
+
+    void addContributorToTrip(Trip trip, User contributor);
+
+    void removeContributorFromTrip(Trip trip, User contributor);
 }

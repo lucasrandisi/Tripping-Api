@@ -1,6 +1,7 @@
 package Triping.controllers;
 
 import Triping.models.Trip;
+import Triping.models.TripParty;
 import Triping.models.User;
 import Triping.services.ITripService;
 import Triping.services.IUserService;
@@ -68,7 +69,37 @@ public class TripController {
         return response;
     }
 
-    @PostMapping(path="/trip/{id}/invite")
+    @PutMapping("/{id}/party/{username}")
+    public GenericResponse addContributor(@PathVariable Long id, @PathVariable String username) throws ResourceNotFoundException {
+        final User authenticatedUser = this.getAuthenticatedUser();
+
+        final Trip trip = tripService.getOne(id,authenticatedUser);
+        final User invitee = userService.findUserByUsername(username);
+        if(trip.isOwner(authenticatedUser)){
+            tripService.addContributorToTrip(trip, invitee);
+            return new GenericResponse("Usuario invitado correctamente y esta pendiente de confirmacion");
+        }
+        else{
+            throw new NotImplementedException();
+        }
+    }
+
+    @DeleteMapping("/{id}/party/{username}")
+    public GenericResponse removeContributor(@PathVariable Long id, @PathVariable String username) throws ResourceNotFoundException {
+        final User authenticatedUser = this.getAuthenticatedUser();
+
+        final Trip trip = tripService.getOne(id,authenticatedUser);
+        final User contributor = userService.findUserByUsername(username);
+        if(trip.isOwner(authenticatedUser)){
+            tripService.removeContributorFromTrip(trip, contributor);
+            return new GenericResponse("Usuario eliminado correctamente");
+        }
+        else{
+            throw new NotImplementedException();
+        }
+    }
+
+    @PostMapping(path="/{id}/invite")
     public GenericResponse inviteFriendsToTrip(){
         throw new NotImplementedException();
     }

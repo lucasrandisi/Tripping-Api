@@ -13,4 +13,5 @@ public interface TripPartyRepository extends JpaRepository<TripParty, TripPartyK
     @Query("select p from TripParty p where (p.user = ?2  and p.trip = ?1)")
     TripParty canUserSeeContent(Trip trip, User user);
 
+    void deleteByTripAndUser(Trip trip, User contributor);
 }
