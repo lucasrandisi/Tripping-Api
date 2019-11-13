@@ -9,7 +9,7 @@ import java.util.*;
 public class User {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
+    private Long userId;
 
     @NaturalId
     @Column(unique = true)
@@ -33,8 +33,6 @@ public class User {
     @OneToMany
     private List<Marker> customMarkers;
 
-
-
     @ManyToMany()
     @JoinTable(name = "users_interests", joinColumns = @JoinColumn(name = "interest_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<Interest> userInterests;
@@ -55,9 +53,9 @@ public class User {
     }
 
 
-    public Long getId() { return id; }
+    public Long getUserId() { return userId; }
 
-    public void setId(Long id) { this.id = id; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
     public String getUsername() {
         return username;
@@ -98,4 +96,26 @@ public class User {
     public Set<Interest> getUserInterests() { return userInterests; }
 
     public void setUserInterests(Set<Interest> userInterests) {this.userInterests = userInterests; }
+
+    public Set<TripParty> getTripParties() {
+        return tripParties;
+    }
+
+    public void setTripParties(Set<TripParty> tripParties) {
+        this.tripParties = tripParties;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return userId.equals(user.userId) &&
+                username.equals(user.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, username);
+    }
 }
