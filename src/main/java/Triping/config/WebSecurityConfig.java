@@ -31,8 +31,13 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.antMatcher("/**")
             .authorizeRequests()
+                .antMatchers(HttpMethod.GET,"/interest/all").permitAll()
+                .antMatchers(HttpMethod.GET, "/*/profile").permitAll()
+                .antMatchers(HttpMethod.GET, "/*/friends").permitAll()
+                .antMatchers(HttpMethod.GET,"/").permitAll()
+
                 .antMatchers(HttpMethod.POST, "/auth", "/user/register" ).permitAll()
-                .antMatchers("/").permitAll()
+
                 .anyRequest().authenticated()
             .and()
                 .csrf().disable();

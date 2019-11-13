@@ -2,6 +2,7 @@ package Triping.services;
 
 import Triping.dto.AccountDto;
 import Triping.dto.InterestDto;
+import Triping.dto.UserDto;
 import Triping.models.Interest;
 import Triping.models.User;
 import Triping.models.VerificationToken;
@@ -10,6 +11,7 @@ import Triping.repositories.UserRepository;
 import Triping.repositories.VerificationTokenRepository;
 import Triping.utils.exceptions.AlredyAddedException;
 import Triping.utils.exceptions.ResourceNotFoundException;
+import Triping.utils.exceptions.SameEntityException;
 import Triping.utils.exceptions.UserAlreadyExistException;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -98,39 +100,48 @@ public class UserService implements IUserService{
         tokenRepository.save(verificationToken);
     }
 
-    @Override
-    public void followUser(User currentUser, String username) throws ResourceNotFoundException {
-        User followedUser = userRepository.findByUsername(username);
-        if(followedUser != null){
-            if(!currentUser.getFriends().contains(followedUser) && currentUser != followedUser){
-                currentUser.getFriends().add(followedUser);
-                userRepository.save(currentUser);
-            }else {
-                throw new ResourceNotFoundException();
-            }
+    // ----------------   Follow    ----------------
 
+    @Override
+    public void followUser(User currentUser, String toFollowUsername) throws ResourceNotFoundException, AlredyAddedException, SameEntityException {
+        User toFollowUser = userRepository.findByUsername(toFollowUsername);
+        if(toFollowUser == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
         }
-        else{
-            throw new ResourceNotFoundException();
+
+        if (currentUser == toFollowUser){
+            throw new SameEntityException("Error al intentar seguir a uno mismo");
         }
+
+        if(currentUser.getFriends().contains(toFollowUser)) {
+            throw new AlredyAddedException("Ya sigue a este usuario");
+        }
+
+        currentUser.getFriends().add(toFollowUser);
+        userRepository.save(currentUser);
+
     }
 
     @Override
-    public void unfollowUser(User currentUser, String username) throws ResourceNotFoundException {
-        User toUnfollowUser = userRepository.findByUsername(username);
-        if(toUnfollowUser != null){
-            if(currentUser.getFriends().contains(toUnfollowUser) && currentUser != toUnfollowUser){
-                currentUser.getFriends().remove(toUnfollowUser);
-                userRepository.save(currentUser);
-            }else{
-                throw new ResourceNotFoundException();
-            }
+    public void unfollowUser(User currentUser, String toUnfollowUsername) throws ResourceNotFoundException, SameEntityException {
+        User toUnfollowUser = userRepository.findByUsername(toUnfollowUsername);
 
-        }else{
-            throw new ResourceNotFoundException();
+        if(toUnfollowUser == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
         }
+
+        if (currentUser == toUnfollowUser) {
+            throw new SameEntityException("Error al intentar dejar de seguir a uno mismo");
+        }
+
+        if(!currentUser.getFriends().contains(toUnfollowUser)) {
+            throw new ResourceNotFoundException("Error al intentar dejar de seguir un usuario al que no se sigue");
+        }
+
+        currentUser.getFriends().remove(toUnfollowUser);
     }
 
+    // ----------------   Interests   ----------------
 
     @Override
     public Set<InterestDto> getInterests(User currentUser){
@@ -172,5 +183,44 @@ public class UserService implements IUserService{
         }
 
         currentUser.getUserInterests().remove(interestToRemove);
+    }
+
+    // ----------------   User's Data   ----------------
+    @Override
+    public UserDto getProfile(String username) throws ResourceNotFoundException {
+        User userToFind = userRepository.findByUsername(username);
+
+        if(userToFind == null){
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
+
+        UserDto userDto = new UserDto();
+        userDto.setNombre(userToFind.getNombre());
+        userDto.setApellido(userToFind.getApellido());
+        userDto.setEmail(userToFind.getEmail());
+        userDto.setUserImage(userToFind.getUserImage());
+
+        return userDto;
+    }
+
+    @Override
+    public List<UserDto> getFriends(String username) throws ResourceNotFoundException {
+        User userToFind = userRepository.findByUsername(username);
+
+        if(userToFind == null){
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
+
+        List<UserDto> userFriends = new ArrayList<>();
+        for(User u : userToFind.getFriends()){
+            UserDto userDto = new UserDto();
+
+            userDto.setNombre(u.getNombre());
+            userDto.setApellido(u.getApellido());
+
+            userFriends.add(userDto);
+        }
+
+        return userFriends;
     }
 }

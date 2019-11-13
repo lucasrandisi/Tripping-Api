@@ -1,10 +1,12 @@
 package Triping.controllers;
 
 import Triping.dto.InterestDto;
+import Triping.dto.UserDto;
 import Triping.models.User;
 import Triping.services.IUserService;
 import Triping.utils.exceptions.AlredyAddedException;
 import Triping.utils.exceptions.ResourceNotFoundException;
+import Triping.utils.exceptions.SameEntityException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,46 +14,44 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/user")
 public class UserController {
 
     @Autowired
     private IUserService userService;
 
-    @PostMapping("/follow/{username}")
-    public String followUser(@PathVariable String username){
+
+    // ------------------ Follow ------------------
+
+    @PostMapping("user/follow/{toFollowUsername}")
+    public ResponseEntity<String> followUser(@PathVariable String toFollowUsername) throws AlredyAddedException, SameEntityException, ResourceNotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
 
-        try {
-            userService.followUser(currentUser, username);
-            return "Agregado";
-        }
-        catch(ResourceNotFoundException e){
-            return e.getMessage();
-        }
+        userService.followUser(currentUser, toFollowUsername);
 
+        return new ResponseEntity<>("Usuario seguido", HttpStatus.OK);
     }
 
-    @DeleteMapping("/unfollow/{username}")
-    public String unfollowUser(@PathVariable String username){
+
+
+    @DeleteMapping("user/unfollow/{toUnfollowUsername}")
+    public ResponseEntity<String> unfollowUser(@PathVariable String toUnfollowUsername) throws ResourceNotFoundException, SameEntityException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
 
-        try {
-            userService.unfollowUser(currentUser,username);
-            return "Unfollowed";
-        }
-        catch(ResourceNotFoundException e){
-            return e.getMessage();
-        }
+        userService.unfollowUser(currentUser,toUnfollowUsername);
+
+        return new ResponseEntity<>("Usuario unfollowed", HttpStatus.OK);
+
     }
 
+    // ------------------ Interests ------------------
 
-    @GetMapping("/interests")
+    @GetMapping("/user/interests")
     public ResponseEntity<Set<InterestDto>> getInterests(){
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
@@ -62,7 +62,7 @@ public class UserController {
     }
 
 
-    @PostMapping("/interests/{id}")
+    @PostMapping("user/interests/{id}")
     public ResponseEntity<String> addInterest(@PathVariable String id) throws ResourceNotFoundException, AlredyAddedException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
@@ -72,7 +72,7 @@ public class UserController {
         return new ResponseEntity<>("Interes agregado", HttpStatus.OK);
     }
 
-    @DeleteMapping("/interests/{id}")
+    @DeleteMapping("user/interests/{id}")
     public ResponseEntity<String> removeInterest(@PathVariable String id) throws ResourceNotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
@@ -82,4 +82,19 @@ public class UserController {
         return new ResponseEntity<>("Interés removido", HttpStatus.OK);
     }
 
+
+    // ------------------ User's data ------------------
+    @GetMapping("/{username}/profile")
+    public ResponseEntity<UserDto> profile(@PathVariable String username) throws ResourceNotFoundException {
+        UserDto userProfile = userService.getProfile(username);
+
+        return new ResponseEntity<>(userProfile, HttpStatus.OK);
+    }
+
+    @GetMapping("/{username}/friends")
+    public ResponseEntity<List<UserDto>> friends(@PathVariable String username) throws  ResourceNotFoundException {
+        List<UserDto> userFriends = userService.getFriends(username);
+
+        return new ResponseEntity<>(userFriends, HttpStatus.OK);
+    }
 }

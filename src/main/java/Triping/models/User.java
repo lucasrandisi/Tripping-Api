@@ -15,14 +15,27 @@ public class User {
     @Column(unique = true)
     private String username;
 
-    private Boolean enabled;
     private String password;
+    private Boolean enabled;
     private String email;
     private byte[] userImage;
-    private String salt;
+    private String nombre;
+    private String apellido;
 
-    @OneToMany
+
+    @ManyToMany
+    @JoinTable(name = "user_friends",
+            joinColumns = @JoinColumn(name="userID", referencedColumnName = "id"),
+            inverseJoinColumns=@JoinColumn(name="friendID", referencedColumnName = "id"))
     private List<User> friends;
+
+
+    @ManyToMany
+    @JoinTable(name="user_friends",
+            joinColumns=@JoinColumn(name="friendID", referencedColumnName = "id"),
+            inverseJoinColumns=@JoinColumn(name="userID", referencedColumnName = "id"))
+    private List<User> friendOf;
+
 
     @OneToMany(mappedBy = "owner")
     private List<Trip> ownedTrips;
@@ -75,9 +88,29 @@ public class User {
         this.password = password;
     }
 
-    public String getSalt() { return salt; }
+    public Boolean getEnabled() {
+        return enabled;
+    }
 
-    public void setSalt(String salt) { this.salt = salt; }
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
 
     public byte[] getUserImage() { return userImage; }
 
