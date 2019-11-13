@@ -1,5 +1,6 @@
 package Triping.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
@@ -27,6 +28,7 @@ public class User {
     @JoinTable(name = "user_friends",
             joinColumns = @JoinColumn(name="userID", referencedColumnName = "id"),
             inverseJoinColumns=@JoinColumn(name="friendID", referencedColumnName = "id"))
+    @JsonIgnoreProperties({"friends", "friendOF"})
     private List<User> friends;
 
 
@@ -34,10 +36,12 @@ public class User {
     @JoinTable(name="user_friends",
             joinColumns=@JoinColumn(name="friendID", referencedColumnName = "id"),
             inverseJoinColumns=@JoinColumn(name="userID", referencedColumnName = "id"))
+    @JsonIgnoreProperties({"friends", "friendOF"})
     private List<User> friendOf;
 
 
     @OneToMany(mappedBy = "owner")
+    @JsonIgnoreProperties("owner")
     private List<Trip> ownedTrips;
 
     @OneToMany

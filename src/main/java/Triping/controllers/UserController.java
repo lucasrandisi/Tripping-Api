@@ -3,6 +3,7 @@ package Triping.controllers;
 import Triping.dto.InterestDto;
 import Triping.dto.TripDto;
 import Triping.dto.UserDto;
+import Triping.models.Trip;
 import Triping.models.User;
 import Triping.services.IUserService;
 import Triping.utils.exceptions.AlredyAddedException;
@@ -106,9 +107,19 @@ public class UserController {
         return new ResponseEntity<>(userFriends, HttpStatus.OK);
     }
 
+
+
+    @GetMapping("/{username}/trips/{tripID}")
+    public ResponseEntity<TripDto> userTrip(@PathVariable String username, @PathVariable String tripID) throws ResourceNotFoundException {
+        TripDto trip = userService.getTrip(username, tripID);
+
+        return new ResponseEntity<>(trip, HttpStatus.OK);
+    }
+
     @GetMapping("/{username}/trips")
-    public ResponseEntity<List<TripDto>> trips(@PathVariable String username) throws ResourceNotFoundException {
-        List<TripDto> userFriends = userService.getTrips(username);
+    public ResponseEntity<List<TripDto>> userTrips(@PathVariable String username, @RequestParam(required = false) String title) throws ResourceNotFoundException {
+
+        List<TripDto> userFriends = userService.getTrips(username, title);
 
         return new ResponseEntity<>(userFriends, HttpStatus.OK);
     }

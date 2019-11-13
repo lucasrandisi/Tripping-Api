@@ -15,7 +15,7 @@ public class TripDto {
     private Date departureDate;
     private Date endDate;
 
-    private User owner;
+    private UserDto owner;
 
     private List<Itinerary> itineraries;
     private Set<TripParty> contributingUsers;
@@ -60,11 +60,11 @@ public class TripDto {
         this.endDate = endDate;
     }
 
-    public User getOwner() {
+    public UserDto getOwner() {
         return owner;
     }
 
-    public void setOwner(User owner) {
+    public void setOwner(UserDto owner) {
         this.owner = owner;
     }
 

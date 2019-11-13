@@ -14,6 +14,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 
 import Triping.utils.exceptions.NotImplementedException;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Trip {
@@ -36,6 +37,7 @@ public class Trip {
 
     @ManyToOne
     @JoinColumn(name="user_id", referencedColumnName = "id")
+    @JsonIgnoreProperties("ownedTrips")
     private User owner;
 
     public Trip(){

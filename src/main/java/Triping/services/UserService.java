@@ -12,10 +12,7 @@ import Triping.repositories.InterestRepository;
 import Triping.repositories.TripRepository;
 import Triping.repositories.UserRepository;
 import Triping.repositories.VerificationTokenRepository;
-import Triping.utils.exceptions.AlredyAddedException;
-import Triping.utils.exceptions.ResourceNotFoundException;
-import Triping.utils.exceptions.SameEntityException;
-import Triping.utils.exceptions.UserAlreadyExistsException;
+import Triping.utils.exceptions.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -251,20 +248,33 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public List<TripDto> getTrips(String username) throws ResourceNotFoundException {
+    public List<TripDto> getTrips(String username, String title) throws ResourceNotFoundException {
         User userToFind = findUserByUsername(username);
-        List<Trip> publicTripsList = tripRepository.findByOwnerAndAccessibility(userToFind, true);
+        List<Trip> publicTripsList;
+
+        if(title != null){
+            publicTripsList = tripRepository.findByOwnerAndAccessibilityAndTitleContaining(userToFind, true, title);
+        }
+        else {
+            publicTripsList = tripRepository.findByOwnerAndAccessibility(userToFind, true);
+        }
 
         List<TripDto> tripDtoList = new ArrayList<TripDto>();
 
         for (Trip trip : publicTripsList){
             TripDto tripDto = new TripDto();
+
             tripDto.setId(trip.getId());
             tripDto.setTitle(trip.getTitle());
             tripDto.setDescription(trip.getDescription());
             tripDto.setDepartureDate(trip.getDepartureDate());
             tripDto.setEndDate(trip.getEndDate());
-            tripDto.setOwner(trip.getOwner());
+
+            UserDto owner = new UserDto();
+            owner.setId(trip.getOwner().getId());;
+            owner.setUsername(trip.getOwner().getUsername());
+
+            tripDto.setOwner(owner);
             tripDto.setItineraries(trip.getItineraries());
             tripDto.setContributingUsers(trip.getContributingUsers());
 
@@ -272,5 +282,36 @@ public class UserService implements IUserService{
         }
 
         return tripDtoList;
+    }
+
+    @Override
+    public TripDto getTrip(String username, String tripID) throws ResourceNotFoundException {
+        User userToFind = findUserByUsername(username);
+
+        long parsedTripID = Long.parseLong(tripID);
+        Optional<Trip> optionalTriptrip = tripRepository.findById(parsedTripID);
+
+        Trip trip = optionalTriptrip.orElseThrow(() -> new ResourceNotFoundException("Viaje no encontrado"));
+
+        if (trip.getOwner() != userToFind) {
+            throw new ResourceNotFoundException("El viaje no pertenece al usuario");
+        }
+
+        TripDto tripDto = new TripDto();
+        tripDto.setId(trip.getId());
+        tripDto.setTitle(trip.getTitle());
+        tripDto.setDescription(trip.getDescription());
+        tripDto.setDepartureDate(trip.getDepartureDate());
+        tripDto.setEndDate(trip.getEndDate());
+
+        UserDto owner = new UserDto();
+        owner.setId(trip.getOwner().getId());;
+        owner.setUsername(trip.getOwner().getUsername());
+
+        tripDto.setOwner(owner);
+        tripDto.setItineraries(trip.getItineraries());
+        tripDto.setContributingUsers(trip.getContributingUsers());
+
+        return tripDto;
     }
 }

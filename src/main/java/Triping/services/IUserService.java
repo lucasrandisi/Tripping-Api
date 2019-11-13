@@ -4,12 +4,11 @@ import Triping.dto.AccountDto;
 import Triping.dto.InterestDto;
 import Triping.dto.TripDto;
 import Triping.dto.UserDto;
+import Triping.models.Trip;
 import Triping.models.User;
 import Triping.models.VerificationToken;
-import Triping.utils.exceptions.AlredyAddedException;
-import Triping.utils.exceptions.ResourceNotFoundException;
-import Triping.utils.exceptions.SameEntityException;
-import Triping.utils.exceptions.UserAlreadyExistsException;
+import Triping.utils.exceptions.*;
+import org.springframework.lang.Nullable;
 
 import java.util.List;
 import java.util.Set;
@@ -46,5 +45,7 @@ public interface IUserService {
 
     List<UserDto> getFollowers(String username) throws ResourceNotFoundException;
 
-    List<TripDto> getTrips(String username) throws ResourceNotFoundException;
+    List<TripDto> getTrips(String username, String title) throws ResourceNotFoundException;
+
+    TripDto getTrip(String username, String tripID) throws ResourceNotFoundException;
 }
