@@ -9,6 +9,7 @@ import javax.persistence.*;
 import Triping.utils.exceptions.NotImplementedException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+
 @Entity
 public class Trip {
 
@@ -33,7 +34,7 @@ public class Trip {
     private Set<TripParty> contributingUsers;
 
     @ManyToOne
-    @JoinColumn(name="owner_id")
+    @JoinColumn(name="owner_id", referencedColumnName = "userId")
     @JsonIgnore
     private User owner;
 

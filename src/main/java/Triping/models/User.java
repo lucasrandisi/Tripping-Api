@@ -1,5 +1,6 @@
 package Triping.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
@@ -15,16 +16,32 @@ public class User {
     @Column(unique = true)
     private String username;
 
-    private Boolean enabled;
     private String password;
+    private Boolean enabled;
     private String email;
     private byte[] userImage;
-    private String salt;
+    private String nombre;
+    private String apellido;
 
-    @OneToMany
+
+    @ManyToMany
+    @JoinTable(name = "user_friends",
+            joinColumns = @JoinColumn(name="userID", referencedColumnName = "userId"),
+            inverseJoinColumns=@JoinColumn(name="friendID", referencedColumnName = "userId"))
+    @JsonIgnoreProperties({"friends", "friendOF"})
     private List<User> friends;
 
+
+    @ManyToMany
+    @JoinTable(name="user_friends",
+            joinColumns=@JoinColumn(name="friendID", referencedColumnName = "userId"),
+            inverseJoinColumns=@JoinColumn(name="userID", referencedColumnName = "userId"))
+    @JsonIgnoreProperties({"friends", "friendOF"})
+    private List<User> friendOf;
+
+
     @OneToMany(mappedBy = "owner")
+    @JsonIgnoreProperties("owner")
     private List<Trip> ownedTrips;
 
     @OneToMany
@@ -73,9 +90,29 @@ public class User {
         this.password = password;
     }
 
-    public String getSalt() { return salt; }
+    public Boolean getEnabled() {
+        return enabled;
+    }
 
-    public void setSalt(String salt) { this.salt = salt; }
+    public void setEnabled(Boolean enabled) {
+        this.enabled = enabled;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
 
     public byte[] getUserImage() { return userImage; }
 
@@ -91,11 +128,19 @@ public class User {
 
     public List<User> getFriends() { return friends; }
 
-    public void setFriends(List<User> friends) { this.friends = friends;}
+    public void setFriends(List<User> friends) { this.friends = friends; }
+
+    public List<User> getFriendOf() { return friendOf; }
+
+    public void setFriendOf(List<User> friendOf) { this.friendOf = friendOf; }
 
     public Set<Interest> getUserInterests() { return userInterests; }
 
     public void setUserInterests(Set<Interest> userInterests) {this.userInterests = userInterests; }
+
+    public List<Trip> getOwnedTrips() { return ownedTrips; }
+
+    public void setOwnedTrips(List<Trip> ownedTrips) { this.ownedTrips = ownedTrips; }
 
     public Set<TripParty> getTripParties() {
         return tripParties;

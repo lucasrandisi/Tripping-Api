@@ -2,15 +2,17 @@ package Triping.services;
 
 import Triping.dto.AccountDto;
 import Triping.dto.InterestDto;
+import Triping.dto.TripDto;
+import Triping.dto.UserDto;
 import Triping.models.Interest;
+import Triping.models.Trip;
 import Triping.models.User;
 import Triping.models.VerificationToken;
 import Triping.repositories.InterestRepository;
+import Triping.repositories.TripRepository;
 import Triping.repositories.UserRepository;
 import Triping.repositories.VerificationTokenRepository;
-import Triping.utils.exceptions.AlredyAddedException;
-import Triping.utils.exceptions.ResourceNotFoundException;
-import Triping.utils.exceptions.UserAlreadyExistException;
+import Triping.utils.exceptions.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -33,16 +35,23 @@ public class UserService implements IUserService{
     @Autowired
     private InterestRepository interestRepository;
 
+    @Autowired
+    private TripRepository tripRepository;
 
-    /* ~~~~~~~~~~ API SERVICES ~~~~~~~~~~~~~ */
+    @Override
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
+
+    // ----------------   Registration    ----------------
     @Override
     public User registerNewUserAccount(final AccountDto accountDto) {
         if (this.findUserByEmail(accountDto.getEmail()) != null) {
-            throw new UserAlreadyExistException("Ya existe una cuenta registrada con " + accountDto.getEmail());
+            throw new UserAlreadyExistsException("Ya existe una cuenta registrada con " + accountDto.getEmail());
         }
 
         if (this.findUserByUsername(accountDto.getUsername()) != null) {
-            throw new UserAlreadyExistException("Ya existe una cuenta registrada con nombre de usuario " + accountDto.getUsername());
+            throw new UserAlreadyExistsException("Ya existe una cuenta registrada con nombre de usuario " + accountDto.getUsername());
         }
 
         //Create new user account deactivated
@@ -58,7 +67,20 @@ public class UserService implements IUserService{
         return (userRepository.save(user));
     }
 
+    @Override
+    public VerificationToken getVerificationToken(String verificationToken) {
+        return tokenRepository.findByToken(verificationToken);
+    }
 
+
+
+    @Override
+    public void createVerificationToken(final User user, final String token) {
+        VerificationToken verificationToken = new VerificationToken(user, token);
+        tokenRepository.save(verificationToken);
+    }
+
+    // ----------------   Log in    ----------------
     public boolean validatePassword(String username, String password){
         User user = userRepository.findByUsername(username);
         if (user == null){
@@ -72,6 +94,7 @@ public class UserService implements IUserService{
     }
 
 
+    // ----------------   Find methods    ----------------
     @Override
     public User findUserByEmail(final String email) {
         return userRepository.findByEmail(email);
@@ -82,55 +105,51 @@ public class UserService implements IUserService{
         return userRepository.findByUsername(username);
     }
 
-    @Override
-    public VerificationToken getVerificationToken(String verificationToken) {
-        return tokenRepository.findByToken(verificationToken);
-    }
+
+
+    // ----------------   Follow    ----------------
 
     @Override
-    public User saveUser(User user) {
-        return userRepository.save(user);
-    }
+    public void followUser(User currentUser, String toFollowUsername) throws ResourceNotFoundException, AlredyAddedException, SameEntityException {
+        User toFollowUser = findUserByUsername(toFollowUsername);
 
-    @Override
-    public void createVerificationToken(final User user, final String token) {
-        VerificationToken verificationToken = new VerificationToken(user, token);
-        tokenRepository.save(verificationToken);
-    }
-
-    @Override
-    public void followUser(User currentUser, String username) throws ResourceNotFoundException {
-        User followedUser = userRepository.findByUsername(username);
-        if(followedUser != null){
-            if(!currentUser.getFriends().contains(followedUser) && currentUser != followedUser){
-                currentUser.getFriends().add(followedUser);
-                userRepository.save(currentUser);
-            }else {
-                throw new ResourceNotFoundException();
-            }
-
+        if (toFollowUser == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
         }
-        else{
-            throw new ResourceNotFoundException();
+
+        if (currentUser == toFollowUser){
+            throw new SameEntityException("Error al intentar seguir a uno mismo");
         }
+
+        if(currentUser.getFriends().contains(toFollowUser)) {
+            throw new AlredyAddedException("Ya sigue a este usuario");
+        }
+
+        currentUser.getFriends().add(toFollowUser);
+        userRepository.save(currentUser);
+
     }
 
     @Override
-    public void unfollowUser(User currentUser, String username) throws ResourceNotFoundException {
-        User toUnfollowUser = userRepository.findByUsername(username);
-        if(toUnfollowUser != null){
-            if(currentUser.getFriends().contains(toUnfollowUser) && currentUser != toUnfollowUser){
-                currentUser.getFriends().remove(toUnfollowUser);
-                userRepository.save(currentUser);
-            }else{
-                throw new ResourceNotFoundException();
-            }
+    public void unfollowUser(User currentUser, String toUnfollowUsername) throws ResourceNotFoundException, SameEntityException {
+        User toUnfollowUser = findUserByUsername(toUnfollowUsername);
 
-        }else{
-            throw new ResourceNotFoundException();
+        if (toUnfollowUser == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
         }
+
+        if (currentUser == toUnfollowUser) {
+            throw new SameEntityException("Error al intentar dejar de seguir a uno mismo");
+        }
+
+        if(!currentUser.getFriends().contains(toUnfollowUser)) {
+            throw new ResourceNotFoundException("Error al intentar dejar de seguir un usuario al que no se sigue");
+        }
+
+        currentUser.getFriends().remove(toUnfollowUser);
     }
 
+    // ----------------   Interests   ----------------
 
     @Override
     public Set<InterestDto> getInterests(User currentUser){
@@ -172,5 +191,143 @@ public class UserService implements IUserService{
         }
 
         currentUser.getUserInterests().remove(interestToRemove);
+    }
+
+    // ----------------   User's Data   ----------------
+    @Override
+    public UserDto getProfile(String username) throws ResourceNotFoundException {
+        User userToFind = findUserByUsername(username);
+
+        if (userToFind == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
+
+        UserDto userDto = new UserDto();
+        userDto.setNombre(userToFind.getNombre());
+        userDto.setApellido(userToFind.getApellido());
+        userDto.setEmail(userToFind.getEmail());
+        userDto.setUserImage(userToFind.getUserImage());
+
+        return userDto;
+    }
+
+    @Override
+    public List<UserDto> getFollowed(String username) throws ResourceNotFoundException {
+        User userToFind = findUserByUsername(username);
+
+        if (userToFind == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
+
+        List<UserDto> followedUsers = new ArrayList<>();
+        for(User u : userToFind.getFriends()){
+            UserDto userDto = new UserDto();
+
+            userDto.setId(u.getUserId());
+            userDto.setNombre(u.getNombre());
+            userDto.setApellido(u.getApellido());
+
+            followedUsers.add(userDto);
+        }
+
+        return followedUsers;
+    }
+
+    @Override
+    public List<UserDto> getFollowers(String username) throws ResourceNotFoundException {
+        User userToFind = findUserByUsername(username);
+
+        if (userToFind == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
+
+        List<UserDto> followers = new ArrayList<>();
+        for(User u : userToFind.getFriendOf()){
+            UserDto userDto = new UserDto();
+
+            userDto.setId(u.getUserId());
+            userDto.setNombre(u.getNombre());
+            userDto.setApellido(u.getApellido());
+
+            followers.add(userDto);
+        }
+
+        return followers;
+    }
+
+    @Override
+    public List<TripDto> getTrips(String username, String title) throws ResourceNotFoundException {
+        User userToFind = findUserByUsername(username);
+
+        if (userToFind == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
+
+        List<Trip> publicTripsList;
+        if(title != null){
+            publicTripsList = tripRepository.findByOwnerAndAccessibilityAndTitleContaining(userToFind, Trip.accessType.PUBLIC, title);
+        }
+        else {
+            publicTripsList = tripRepository.findByOwnerAndAccessibility(userToFind, Trip.accessType.PUBLIC);
+        }
+
+        List<TripDto> tripDtoList = new ArrayList<>();
+
+        for (Trip trip : publicTripsList){
+            TripDto tripDto = new TripDto();
+
+            tripDto.setId(trip.getTripId());
+            tripDto.setTitle(trip.getTitle());
+            tripDto.setDescription(trip.getDescription());
+            tripDto.setDepartureDate(trip.getDepartureDate());
+            tripDto.setEndDate(trip.getEndDate());
+
+            UserDto owner = new UserDto();
+            owner.setId(trip.getOwner().getUserId());
+            owner.setUsername(trip.getOwner().getUsername());
+
+            tripDto.setOwner(owner);
+            tripDto.setItineraries(trip.getItineraries());
+            tripDto.setContributingUsers(trip.getContributingUsers());
+
+            tripDtoList.add(tripDto);
+        }
+
+        return tripDtoList;
+    }
+
+    @Override
+    public TripDto getTrip(String username, String tripID) throws ResourceNotFoundException {
+        User userToFind = findUserByUsername(username);
+
+        if (userToFind == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
+
+        long parsedTripID = Long.parseLong(tripID);
+        Optional<Trip> optionalTriptrip = tripRepository.findByTripIdAndAccessibility(parsedTripID, Trip.accessType.PUBLIC);
+
+        Trip trip = optionalTriptrip.orElseThrow(() -> new ResourceNotFoundException("Viaje no encontrado"));
+
+        if (trip.getOwner() != userToFind) {
+            throw new ResourceNotFoundException("El viaje no pertenece al usuario");
+        }
+
+        TripDto tripDto = new TripDto();
+        tripDto.setId(trip.getTripId());
+        tripDto.setTitle(trip.getTitle());
+        tripDto.setDescription(trip.getDescription());
+        tripDto.setDepartureDate(trip.getDepartureDate());
+        tripDto.setEndDate(trip.getEndDate());
+
+        UserDto owner = new UserDto();
+        owner.setId(trip.getOwner().getUserId());
+        owner.setUsername(trip.getOwner().getUsername());
+
+        tripDto.setOwner(owner);
+        tripDto.setItineraries(trip.getItineraries());
+        tripDto.setContributingUsers(trip.getContributingUsers());
+
+        return tripDto;
     }
 }
