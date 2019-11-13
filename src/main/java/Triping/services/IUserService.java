@@ -25,7 +25,7 @@ public interface IUserService {
 
     VerificationToken getVerificationToken(String token);
 
-    User saveUser(User user);
+    void saveUser(User user);
 
     void createVerificationToken(User user, String token);
 
@@ -41,5 +41,7 @@ public interface IUserService {
 
     UserDto getProfile(String username) throws ResourceNotFoundException;
 
-    List<UserDto> getFriends(String username) throws ResourceNotFoundException;
+    List<UserDto> getFollowed(String username) throws ResourceNotFoundException;
+
+    List<UserDto> getFollowers(String username) throws ResourceNotFoundException;
 }

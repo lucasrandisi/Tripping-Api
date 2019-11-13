@@ -33,7 +33,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
             .authorizeRequests()
                 .antMatchers(HttpMethod.GET,"/interest/all").permitAll()
                 .antMatchers(HttpMethod.GET, "/*/profile").permitAll()
-                .antMatchers(HttpMethod.GET, "/*/friends").permitAll()
+                .antMatchers(HttpMethod.GET, "/*/followed").permitAll()
+                .antMatchers(HttpMethod.GET, "/*/followers").permitAll()
                 .antMatchers(HttpMethod.GET,"/").permitAll()
 
                 .antMatchers(HttpMethod.POST, "/auth", "/user/register" ).permitAll()

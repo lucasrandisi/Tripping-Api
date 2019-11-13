@@ -128,6 +128,14 @@ public class User {
 
     public void setFriends(List<User> friends) { this.friends = friends;}
 
+    public List<User> getFriendOf() {
+        return friendOf;
+    }
+
+    public void setFriendOf(List<User> friendOf) {
+        this.friendOf = friendOf;
+    }
+
     public Set<Interest> getUserInterests() { return userInterests; }
 
     public void setUserInterests(Set<Interest> userInterests) {this.userInterests = userInterests; }

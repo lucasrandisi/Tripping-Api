@@ -91,9 +91,16 @@ public class UserController {
         return new ResponseEntity<>(userProfile, HttpStatus.OK);
     }
 
-    @GetMapping("/{username}/friends")
-    public ResponseEntity<List<UserDto>> friends(@PathVariable String username) throws  ResourceNotFoundException {
-        List<UserDto> userFriends = userService.getFriends(username);
+    @GetMapping("/{username}/followed")
+    public ResponseEntity<List<UserDto>> followed(@PathVariable String username) throws  ResourceNotFoundException {
+        List<UserDto> userFriends = userService.getFollowed(username);
+
+        return new ResponseEntity<>(userFriends, HttpStatus.OK);
+    }
+
+    @GetMapping("/{username}/followers")
+    public ResponseEntity<List<UserDto>> followers(@PathVariable String username) throws  ResourceNotFoundException {
+        List<UserDto> userFriends = userService.getFollowers(username);
 
         return new ResponseEntity<>(userFriends, HttpStatus.OK);
     }

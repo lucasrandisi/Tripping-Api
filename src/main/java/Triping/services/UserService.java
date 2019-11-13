@@ -90,8 +90,8 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public User saveUser(User user) {
-        return userRepository.save(user);
+    public void saveUser(User user) {
+        userRepository.save(user);
     }
 
     @Override
@@ -204,23 +204,44 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public List<UserDto> getFriends(String username) throws ResourceNotFoundException {
+    public List<UserDto> getFollowed(String username) throws ResourceNotFoundException {
         User userToFind = userRepository.findByUsername(username);
 
         if(userToFind == null){
             throw new ResourceNotFoundException("Usuario no encontrado");
         }
 
-        List<UserDto> userFriends = new ArrayList<>();
+        List<UserDto> followedUsers = new ArrayList<>();
         for(User u : userToFind.getFriends()){
             UserDto userDto = new UserDto();
 
             userDto.setNombre(u.getNombre());
             userDto.setApellido(u.getApellido());
 
-            userFriends.add(userDto);
+            followedUsers.add(userDto);
         }
 
-        return userFriends;
+        return followedUsers;
+    }
+
+    @Override
+    public List<UserDto> getFollowers(String username) throws ResourceNotFoundException {
+        User userToFind = userRepository.findByUsername(username);
+
+        if(userToFind == null){
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
+
+        List<UserDto> followers = new ArrayList<>();
+        for(User u : userToFind.getFriendOf()){
+            UserDto userDto = new UserDto();
+
+            userDto.setNombre(u.getNombre());
+            userDto.setApellido(u.getApellido());
+
+            followers.add(userDto);
+        }
+
+        return followers;
     }
 }
