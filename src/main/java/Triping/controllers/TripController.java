@@ -39,28 +39,30 @@ public class TripController {
 
     @GetMapping("/{id}")
     public ResponseEntity<Trip> getTripById(@PathVariable(value = "id") Long id) throws ResourceNotFoundException {
-        Trip trip = tripService.getOne(id);
+        Trip trip = tripService.getOne(id, getAuthenticatedUser());
         return ResponseEntity.ok().body(trip);
     }
 
     @PostMapping
-    public Trip createNewTrip(@Valid @RequestBody Trip trip) throws ResourceNotFoundException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
-        trip.setOwner(currentUser);
-        return tripService.createNewTrip(trip);
+    public Trip createNewTrip(@Valid @RequestBody Trip trip){
+        final User authenticatedUser = this.getAuthenticatedUser();
+        trip.setOwner(authenticatedUser);
+        return tripService.createNewTrip(trip, authenticatedUser);
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<Trip> updateTrip(@PathVariable(value = "id") Long id, @Valid @RequestBody Trip tripDetails) throws ResourceNotFoundException {
-        final Trip updatedTrip = tripService.updateTrip(id, tripDetails);
+        final User authenticatedUser = this.getAuthenticatedUser();
+
+        final Trip updatedTrip = tripService.updateTrip(id, tripDetails, authenticatedUser);
         return ResponseEntity.ok().body(updatedTrip);
     }
 
     @DeleteMapping("{id}")
     public Map<String, Boolean> deleteTrip(@PathVariable Long id) throws ResourceNotFoundException {
+        final User authenticatedUser = this.getAuthenticatedUser();
+        tripService.deleteTrip(id, authenticatedUser);
 
-        tripService.deleteTrip(id);
         Map<String, Boolean> response = new HashMap<>();
         response.put("deleted", Boolean.TRUE);
         return response;
@@ -71,4 +73,8 @@ public class TripController {
         throw new NotImplementedException();
     }
 
+    public User getAuthenticatedUser(){
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        return userService.findUserByUsername(auth.getPrincipal().toString());
+    }
 }

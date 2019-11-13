@@ -24,9 +24,11 @@ public class Trip {
 
     private String title;
     private String description;
-    private Boolean accessibility;
     private Date departureDate;
     private Date endDate;
+
+    public enum accessType {PUBLIC, PRIVATE}
+    private accessType accessibility;
 
     @ManyToMany
     @JoinTable(name = "trips_itineraries", joinColumns = @JoinColumn(name = "itinerary_id"), inverseJoinColumns = @JoinColumn(name = "trip_id"))
@@ -36,12 +38,12 @@ public class Trip {
     private Set<TripParty> contributingUsers;
 
     @ManyToOne
-    @JoinColumn(name="user_id", referencedColumnName = "userId")
+    @JoinColumn(name="owner_id", referencedColumnName = "userId")
     @JsonIgnoreProperties("ownedTrips")
     private User owner;
 
     public Trip(){
-        this.accessibility = true;
+        this.accessibility = accessType.PUBLIC;
     }
 
     //ToDo
@@ -49,13 +51,13 @@ public class Trip {
         throw new NotImplementedException();
     }
 
-    public Long getId() { return tripId; }
+    public Long getTripId() { return tripId; }
 
-    public void setId(Long id) { this.tripId = id;}
+    public void setTripId(Long tripId) { this.tripId = tripId;}
 
-    public boolean isAccessibility() { return accessibility; }
+    public accessType getAccessibility() { return accessibility; }
 
-    public void setAccessibility(boolean accessibility) { this.accessibility = accessibility; }
+    public void setAccessibility(accessType accessibility) { this.accessibility = accessibility; }
 
     public Date getDepartureDate() { return departureDate; }
 
@@ -89,14 +91,6 @@ public class Trip {
         this.description = description;
     }
 
-    public Boolean getAccessibility() {
-        return accessibility;
-    }
-
-    public void setAccessibility(Boolean accessibility) {
-        this.accessibility = accessibility;
-    }
-
     public User getOwner() {
         return owner;
     }
@@ -104,6 +98,4 @@ public class Trip {
     public void setOwner(User user) {
         this.owner = user;
     }
-
-
 }

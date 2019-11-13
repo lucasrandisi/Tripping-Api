@@ -70,9 +70,9 @@ public class User {
     }
 
 
-    public Long getId() { return userId; }
+    public Long getUserId() { return userId; }
 
-    public void setId(Long id) { this.userId = id; }
+    public void setUserId(Long userId) { this.userId = userId; }
 
     public String getUsername() {
         return username;
@@ -141,4 +141,26 @@ public class User {
     public List<Trip> getOwnedTrips() { return ownedTrips; }
 
     public void setOwnedTrips(List<Trip> ownedTrips) { this.ownedTrips = ownedTrips; }
+
+    public Set<TripParty> getTripParties() {
+        return tripParties;
+    }
+
+    public void setTripParties(Set<TripParty> tripParties) {
+        this.tripParties = tripParties;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof User)) return false;
+        User user = (User) o;
+        return userId.equals(user.userId) &&
+                username.equals(user.username);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId, username);
+    }
 }
