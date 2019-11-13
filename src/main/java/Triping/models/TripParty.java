@@ -10,12 +10,12 @@ public class TripParty implements Serializable {
     @EmbeddedId
     private TripPartyKey id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("user_id")
     @JoinColumn(name = "user_id")
     private User user;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @MapsId("trip_id")
     @JoinColumn(name = "trip_id")
     private Trip trip;
@@ -24,6 +24,13 @@ public class TripParty implements Serializable {
 
     @Enumerated(EnumType.STRING)
     private PartyPermission role;
+
+    public TripParty(Trip trip, User user, PartyPermission role){
+        this.id = new TripPartyKey(trip.getTripId(),user.getUserId());
+        this.user = user;
+        this.trip = trip;
+        this.invitationConfirmationPending = true;
+    }
 
     private boolean invitationConfirmationPending;
 

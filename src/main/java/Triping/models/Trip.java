@@ -4,16 +4,10 @@ import java.sql.Date;
 import java.util.List;
 import java.util.Set;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 
 import Triping.utils.exceptions.NotImplementedException;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
 public class Trip {
@@ -31,13 +25,16 @@ public class Trip {
 
     @ManyToMany
     @JoinTable(name = "trips_itineraries", joinColumns = @JoinColumn(name = "itinerary_id"), inverseJoinColumns = @JoinColumn(name = "trip_id"))
+    @JsonIgnore
     private List<Itinerary> itineraries;
 
-    @OneToMany(mappedBy = "trip")
+    @OneToMany(mappedBy = "trip", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
     private Set<TripParty> contributingUsers;
 
     @ManyToOne
     @JoinColumn(name="owner_id")
+    @JsonIgnore
     private User owner;
 
     public Trip(){
@@ -47,6 +44,10 @@ public class Trip {
     //ToDo
     public float calculateTripCost(){
         throw new NotImplementedException();
+    }
+
+    public Boolean isOwner(User user){
+        return this.getOwner().equals(user);
     }
 
     public Long getTripId() { return tripId; }

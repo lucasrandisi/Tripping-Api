@@ -1,5 +1,6 @@
 package Triping.tasks;
 
+import Triping.repositories.InvitationTokenRepository;
 import Triping.repositories.VerificationTokenRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,10 @@ import java.util.Date;
 public class TokenPurgeTask {
 
     @Autowired
-    VerificationTokenRepository tokenRepository;
+    VerificationTokenRepository verificationTokenRepository;
+
+    @Autowired
+    InvitationTokenRepository invitationTokenRepository;
 
     /*
     @Autowired
@@ -29,6 +33,7 @@ public class TokenPurgeTask {
         Date now = Date.from(Instant.now());
 
         //passwordTokenRepository.deleteAllExpiredSince(now);
-        tokenRepository.deleteAllExpiredSince(now);
+        verificationTokenRepository.deleteAllExpiredSince(now);
+        invitationTokenRepository.deleteAllExpiredSince(now);
     }
 }
