@@ -46,8 +46,6 @@ public class User {
     @OneToMany
     private List<Marker> customMarkers;
 
-
-
     @ManyToMany()
     @JoinTable(name = "users_interests", joinColumns = @JoinColumn(name = "interest_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
     private Set<Interest> userInterests;
@@ -126,17 +124,17 @@ public class User {
 
     public List<User> getFriends() { return friends; }
 
-    public void setFriends(List<User> friends) { this.friends = friends;}
+    public void setFriends(List<User> friends) { this.friends = friends; }
 
-    public List<User> getFriendOf() {
-        return friendOf;
-    }
+    public List<User> getFriendOf() { return friendOf; }
 
-    public void setFriendOf(List<User> friendOf) {
-        this.friendOf = friendOf;
-    }
+    public void setFriendOf(List<User> friendOf) { this.friendOf = friendOf; }
 
     public Set<Interest> getUserInterests() { return userInterests; }
 
     public void setUserInterests(Set<Interest> userInterests) {this.userInterests = userInterests; }
+
+    public List<Trip> getOwnedTrips() { return ownedTrips; }
+
+    public void setOwnedTrips(List<Trip> ownedTrips) { this.ownedTrips = ownedTrips; }
 }

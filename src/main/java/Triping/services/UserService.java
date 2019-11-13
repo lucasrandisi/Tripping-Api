@@ -2,17 +2,20 @@ package Triping.services;
 
 import Triping.dto.AccountDto;
 import Triping.dto.InterestDto;
+import Triping.dto.TripDto;
 import Triping.dto.UserDto;
 import Triping.models.Interest;
+import Triping.models.Trip;
 import Triping.models.User;
 import Triping.models.VerificationToken;
 import Triping.repositories.InterestRepository;
+import Triping.repositories.TripRepository;
 import Triping.repositories.UserRepository;
 import Triping.repositories.VerificationTokenRepository;
 import Triping.utils.exceptions.AlredyAddedException;
 import Triping.utils.exceptions.ResourceNotFoundException;
 import Triping.utils.exceptions.SameEntityException;
-import Triping.utils.exceptions.UserAlreadyExistException;
+import Triping.utils.exceptions.UserAlreadyExistsException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -35,16 +38,23 @@ public class UserService implements IUserService{
     @Autowired
     private InterestRepository interestRepository;
 
+    @Autowired
+    private TripRepository tripRepository;
 
-    /* ~~~~~~~~~~ API SERVICES ~~~~~~~~~~~~~ */
     @Override
-    public User registerNewUserAccount(final AccountDto accountDto) {
+    public void saveUser(User user) {
+        userRepository.save(user);
+    }
+
+    // ----------------   Registration    ----------------
+    @Override
+    public User registerNewUserAccount(final AccountDto accountDto) throws ResourceNotFoundException {
         if (this.findUserByEmail(accountDto.getEmail()) != null) {
-            throw new UserAlreadyExistException("Ya existe una cuenta registrada con " + accountDto.getEmail());
+            throw new UserAlreadyExistsException("Ya existe una cuenta registrada con " + accountDto.getEmail());
         }
 
         if (this.findUserByUsername(accountDto.getUsername()) != null) {
-            throw new UserAlreadyExistException("Ya existe una cuenta registrada con nombre de usuario " + accountDto.getUsername());
+            throw new UserAlreadyExistsException("Ya existe una cuenta registrada con nombre de usuario " + accountDto.getUsername());
         }
 
         //Create new user account deactivated
@@ -60,7 +70,20 @@ public class UserService implements IUserService{
         return (userRepository.save(user));
     }
 
+    @Override
+    public VerificationToken getVerificationToken(String verificationToken) {
+        return tokenRepository.findByToken(verificationToken);
+    }
 
+
+
+    @Override
+    public void createVerificationToken(final User user, final String token) {
+        VerificationToken verificationToken = new VerificationToken(user, token);
+        tokenRepository.save(verificationToken);
+    }
+
+    // ----------------   Log in    ----------------
     public boolean validatePassword(String username, String password){
         User user = userRepository.findByUsername(username);
         if (user == null){
@@ -74,40 +97,36 @@ public class UserService implements IUserService{
     }
 
 
+    // ----------------   Find methods    ----------------
     @Override
-    public User findUserByEmail(final String email) {
-        return userRepository.findByEmail(email);
+    public User findUserByEmail(final String email) throws ResourceNotFoundException {
+        User user = userRepository.findByUsername(email);
+
+        if(user == null) {
+            throw  new ResourceNotFoundException("Usuario no encontrado");
+        }
+
+        return user;
     }
 
     @Override
-    public User findUserByUsername(String username) {
-        return userRepository.findByUsername(username);
+    public User findUserByUsername(String username) throws ResourceNotFoundException {
+        User user = userRepository.findByUsername(username);
+
+        if(user == null) {
+            throw  new ResourceNotFoundException("Usuario no encontrado");
+        }
+
+        return user;
     }
 
-    @Override
-    public VerificationToken getVerificationToken(String verificationToken) {
-        return tokenRepository.findByToken(verificationToken);
-    }
 
-    @Override
-    public void saveUser(User user) {
-        userRepository.save(user);
-    }
-
-    @Override
-    public void createVerificationToken(final User user, final String token) {
-        VerificationToken verificationToken = new VerificationToken(user, token);
-        tokenRepository.save(verificationToken);
-    }
 
     // ----------------   Follow    ----------------
 
     @Override
     public void followUser(User currentUser, String toFollowUsername) throws ResourceNotFoundException, AlredyAddedException, SameEntityException {
-        User toFollowUser = userRepository.findByUsername(toFollowUsername);
-        if(toFollowUser == null) {
-            throw new ResourceNotFoundException("Usuario no encontrado");
-        }
+        User toFollowUser = findUserByUsername(toFollowUsername);
 
         if (currentUser == toFollowUser){
             throw new SameEntityException("Error al intentar seguir a uno mismo");
@@ -124,11 +143,7 @@ public class UserService implements IUserService{
 
     @Override
     public void unfollowUser(User currentUser, String toUnfollowUsername) throws ResourceNotFoundException, SameEntityException {
-        User toUnfollowUser = userRepository.findByUsername(toUnfollowUsername);
-
-        if(toUnfollowUser == null) {
-            throw new ResourceNotFoundException("Usuario no encontrado");
-        }
+        User toUnfollowUser = findUserByUsername(toUnfollowUsername);
 
         if (currentUser == toUnfollowUser) {
             throw new SameEntityException("Error al intentar dejar de seguir a uno mismo");
@@ -188,11 +203,7 @@ public class UserService implements IUserService{
     // ----------------   User's Data   ----------------
     @Override
     public UserDto getProfile(String username) throws ResourceNotFoundException {
-        User userToFind = userRepository.findByUsername(username);
-
-        if(userToFind == null){
-            throw new ResourceNotFoundException("Usuario no encontrado");
-        }
+        User userToFind = findUserByUsername(username);
 
         UserDto userDto = new UserDto();
         userDto.setNombre(userToFind.getNombre());
@@ -205,16 +216,13 @@ public class UserService implements IUserService{
 
     @Override
     public List<UserDto> getFollowed(String username) throws ResourceNotFoundException {
-        User userToFind = userRepository.findByUsername(username);
-
-        if(userToFind == null){
-            throw new ResourceNotFoundException("Usuario no encontrado");
-        }
+        User userToFind = findUserByUsername(username);
 
         List<UserDto> followedUsers = new ArrayList<>();
         for(User u : userToFind.getFriends()){
             UserDto userDto = new UserDto();
 
+            userDto.setId(u.getId());
             userDto.setNombre(u.getNombre());
             userDto.setApellido(u.getApellido());
 
@@ -226,16 +234,13 @@ public class UserService implements IUserService{
 
     @Override
     public List<UserDto> getFollowers(String username) throws ResourceNotFoundException {
-        User userToFind = userRepository.findByUsername(username);
-
-        if(userToFind == null){
-            throw new ResourceNotFoundException("Usuario no encontrado");
-        }
+        User userToFind = findUserByUsername(username);
 
         List<UserDto> followers = new ArrayList<>();
         for(User u : userToFind.getFriendOf()){
             UserDto userDto = new UserDto();
 
+            userDto.setId(u.getId());
             userDto.setNombre(u.getNombre());
             userDto.setApellido(u.getApellido());
 
@@ -243,5 +248,29 @@ public class UserService implements IUserService{
         }
 
         return followers;
+    }
+
+    @Override
+    public List<TripDto> getTrips(String username) throws ResourceNotFoundException {
+        User userToFind = findUserByUsername(username);
+        List<Trip> publicTripsList = tripRepository.findByOwnerAndAccessibility(userToFind, true);
+
+        List<TripDto> tripDtoList = new ArrayList<TripDto>();
+
+        for (Trip trip : publicTripsList){
+            TripDto tripDto = new TripDto();
+            tripDto.setId(trip.getId());
+            tripDto.setTitle(trip.getTitle());
+            tripDto.setDescription(trip.getDescription());
+            tripDto.setDepartureDate(trip.getDepartureDate());
+            tripDto.setEndDate(trip.getEndDate());
+            tripDto.setOwner(trip.getOwner());
+            tripDto.setItineraries(trip.getItineraries());
+            tripDto.setContributingUsers(trip.getContributingUsers());
+
+            tripDtoList.add(tripDto);
+        }
+
+        return tripDtoList;
     }
 }

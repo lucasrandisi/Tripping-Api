@@ -5,6 +5,7 @@ import Triping.models.User;
 import java.util.List;
 
 public class UserDto {
+    private Long id;
     private String nombre;
     private String apellido;
     private String username;
@@ -49,5 +50,13 @@ public class UserDto {
 
     public void setUserImage(byte[] userImage) {
         this.userImage = userImage;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 }

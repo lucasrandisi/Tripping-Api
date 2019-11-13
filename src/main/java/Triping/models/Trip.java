@@ -35,7 +35,7 @@ public class Trip {
     private Set<TripParty> contributingUsers;
 
     @ManyToOne
-    @JoinColumn(name="user_id")
+    @JoinColumn(name="user_id", referencedColumnName = "id")
     private User owner;
 
     public Trip(){
@@ -102,4 +102,6 @@ public class Trip {
     public void setOwner(User user) {
         this.owner = user;
     }
+
+
 }

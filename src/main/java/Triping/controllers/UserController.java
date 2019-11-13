@@ -1,6 +1,7 @@
 package Triping.controllers;
 
 import Triping.dto.InterestDto;
+import Triping.dto.TripDto;
 import Triping.dto.UserDto;
 import Triping.models.User;
 import Triping.services.IUserService;
@@ -52,7 +53,7 @@ public class UserController {
     // ------------------ Interests ------------------
 
     @GetMapping("/user/interests")
-    public ResponseEntity<Set<InterestDto>> getInterests(){
+    public ResponseEntity<Set<InterestDto>> getInterests() throws ResourceNotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
 
@@ -101,6 +102,13 @@ public class UserController {
     @GetMapping("/{username}/followers")
     public ResponseEntity<List<UserDto>> followers(@PathVariable String username) throws  ResourceNotFoundException {
         List<UserDto> userFriends = userService.getFollowers(username);
+
+        return new ResponseEntity<>(userFriends, HttpStatus.OK);
+    }
+
+    @GetMapping("/{username}/trips")
+    public ResponseEntity<List<TripDto>> trips(@PathVariable String username) throws ResourceNotFoundException {
+        List<TripDto> userFriends = userService.getTrips(username);
 
         return new ResponseEntity<>(userFriends, HttpStatus.OK);
     }

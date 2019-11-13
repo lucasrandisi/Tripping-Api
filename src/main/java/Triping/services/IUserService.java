@@ -2,26 +2,27 @@ package Triping.services;
 
 import Triping.dto.AccountDto;
 import Triping.dto.InterestDto;
+import Triping.dto.TripDto;
 import Triping.dto.UserDto;
 import Triping.models.User;
 import Triping.models.VerificationToken;
 import Triping.utils.exceptions.AlredyAddedException;
 import Triping.utils.exceptions.ResourceNotFoundException;
 import Triping.utils.exceptions.SameEntityException;
-import Triping.utils.exceptions.UserAlreadyExistException;
+import Triping.utils.exceptions.UserAlreadyExistsException;
 
 import java.util.List;
 import java.util.Set;
 
 public interface IUserService {
 
-    User registerNewUserAccount(AccountDto accountDto) throws UserAlreadyExistException, ResourceNotFoundException;
+    User registerNewUserAccount(AccountDto accountDto) throws UserAlreadyExistsException, ResourceNotFoundException;
 
     boolean validatePassword(String username, String password);
 
-    User findUserByEmail(final String email);
+    User findUserByEmail(final String email) throws ResourceNotFoundException;
 
-    User findUserByUsername(final String username);
+    User findUserByUsername(final String username) throws ResourceNotFoundException;
 
     VerificationToken getVerificationToken(String token);
 
@@ -44,4 +45,6 @@ public interface IUserService {
     List<UserDto> getFollowed(String username) throws ResourceNotFoundException;
 
     List<UserDto> getFollowers(String username) throws ResourceNotFoundException;
+
+    List<TripDto> getTrips(String username) throws ResourceNotFoundException;
 }

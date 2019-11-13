@@ -44,7 +44,7 @@ public class TripController {
     }
 
     @PostMapping
-    public Trip createNewTrip(@Valid @RequestBody Trip trip){
+    public Trip createNewTrip(@Valid @RequestBody Trip trip) throws ResourceNotFoundException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
         trip.setOwner(currentUser);
