@@ -1,5 +1,6 @@
 package Triping.controllers;
 
+import Triping.models.InvitationToken;
 import Triping.models.Trip;
 import Triping.models.TripParty;
 import Triping.models.User;
@@ -7,6 +8,7 @@ import Triping.services.ITripService;
 import Triping.services.IUserService;
 import Triping.utils.ErrorDetails;
 import Triping.utils.GenericResponse;
+import Triping.utils.exceptions.AccessDeniedException;
 import Triping.utils.exceptions.NotImplementedException;
 
 import Triping.utils.exceptions.ResourceNotFoundException;
@@ -16,12 +18,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.net.URI;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api/v1/trips")
@@ -70,38 +71,66 @@ public class TripController {
     }
 
     @PutMapping("/{id}/party/{username}")
-    public GenericResponse addContributor(@PathVariable Long id, @PathVariable String username) throws ResourceNotFoundException {
+    public ResponseEntity<?> addContributor(@PathVariable Long id, @PathVariable String username) throws ResourceNotFoundException {
         final User authenticatedUser = this.getAuthenticatedUser();
 
         final Trip trip = tripService.getOne(id,authenticatedUser);
         final User invitee = userService.findUserByUsername(username);
         if(trip.isOwner(authenticatedUser)){
             tripService.addContributorToTrip(trip, invitee);
-            return new GenericResponse("Usuario invitado correctamente y esta pendiente de confirmacion");
+            return new ResponseEntity<>("User invitation is pending on confirmation", HttpStatus.OK);
         }
         else{
-            throw new NotImplementedException();
+            throw new AccessDeniedException("No tienes acceso para realizar esta operacion");
         }
     }
 
     @DeleteMapping("/{id}/party/{username}")
-    public GenericResponse removeContributor(@PathVariable Long id, @PathVariable String username) throws ResourceNotFoundException {
+    public ResponseEntity<?> removeContributor(@PathVariable Long id, @PathVariable String username) throws ResourceNotFoundException {
         final User authenticatedUser = this.getAuthenticatedUser();
 
         final Trip trip = tripService.getOne(id,authenticatedUser);
         final User contributor = userService.findUserByUsername(username);
         if(trip.isOwner(authenticatedUser)){
             tripService.removeContributorFromTrip(trip, contributor);
-            return new GenericResponse("Usuario eliminado correctamente");
+            return new ResponseEntity<>("Contributor removed from trip", HttpStatus.OK);
         }
         else{
-            throw new NotImplementedException();
+            throw new AccessDeniedException("No tienes acceso para realizar esta operacion");
         }
     }
 
     @PostMapping(path="/{id}/invite")
-    public GenericResponse inviteFriendsToTrip(){
-        throw new NotImplementedException();
+    public ResponseEntity<?> generateInvitationLink(@PathVariable Long id) throws ResourceNotFoundException {
+        final User authenticatedUser = this.getAuthenticatedUser();
+        final Trip trip = tripService.getOne(id, authenticatedUser);
+
+        String token = UUID.randomUUID().toString();
+        tripService.createInvitationToken(trip, token);
+
+        String confirmationUrl = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString() + "/join?token=" + token;
+        return ResponseEntity.ok(confirmationUrl);
+    }
+
+    @GetMapping(path="/join")
+    public ResponseEntity<?> joinTripViaInvitationLink(@RequestParam String token){
+        InvitationToken invitationToken = tripService.getInvitationToken(token);
+
+        if (invitationToken == null) {
+            return new ResponseEntity<>("Invalid token", HttpStatus.BAD_REQUEST);
+        }
+        if(invitationToken.isExpired()){
+            return new ResponseEntity<>("Expired token", HttpStatus.BAD_REQUEST);
+        }
+
+        Trip trip = invitationToken.getTrip();
+        final User invitee = this.getAuthenticatedUser();
+        tripService.addContributorToTrip(trip, invitee);
+
+        URI resourceLocation = ServletUriComponentsBuilder.fromPath("/api/v1/trips/{id}")
+                .buildAndExpand(trip.getTripId()).toUri();
+
+        return ResponseEntity.ok(resourceLocation);
     }
 
     public User getAuthenticatedUser(){

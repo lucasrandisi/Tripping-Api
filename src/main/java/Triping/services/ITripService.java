@@ -1,5 +1,6 @@
 package Triping.services;
 
+import Triping.models.InvitationToken;
 import Triping.models.Trip;
 import Triping.models.TripParty;
 import Triping.models.User;
@@ -22,4 +23,8 @@ public interface ITripService {
     void addContributorToTrip(Trip trip, User contributor);
 
     void removeContributorFromTrip(Trip trip, User contributor);
+
+    InvitationToken getInvitationToken(String token);
+
+    void createInvitationToken(Trip trip, String token);
 }

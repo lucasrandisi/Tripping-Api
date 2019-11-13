@@ -1,11 +1,10 @@
 package Triping.services;
 
+import Triping.models.InvitationToken;
 import Triping.models.Trip;
 import Triping.models.TripParty;
 import Triping.models.User;
-import Triping.repositories.TripPartyRepository;
-import Triping.repositories.TripRepository;
-import Triping.repositories.UserRepository;
+import Triping.repositories.*;
 import Triping.utils.exceptions.AccessDeniedException;
 import Triping.utils.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +25,7 @@ public class TripService implements ITripService{
     private TripPartyRepository tripPartyRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private InvitationTokenRepository invitationTokenRepository;
 
     @Override
     public List<Trip> findAll() {
@@ -89,6 +88,17 @@ public class TripService implements ITripService{
     @Override
     public void removeContributorFromTrip(Trip trip, User contributor) {
         tripPartyRepository.deleteByTripAndUser(trip,contributor);
+    }
+
+    @Override
+    public InvitationToken getInvitationToken(String token) {
+        return invitationTokenRepository.findByToken(token);
+    }
+
+    @Override
+    public void createInvitationToken(Trip trip, String token) {
+        InvitationToken verificationToken = new InvitationToken(trip, token);
+        invitationTokenRepository.save(verificationToken);
     }
 
 
