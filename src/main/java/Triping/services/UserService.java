@@ -223,7 +223,7 @@ public class UserService implements IUserService{
         for(User u : userToFind.getFriends()){
             UserDto userDto = new UserDto();
 
-            userDto.setId(u.getId());
+            userDto.setId(u.getUserId());
             userDto.setNombre(u.getNombre());
             userDto.setApellido(u.getApellido());
 
@@ -245,7 +245,7 @@ public class UserService implements IUserService{
         for(User u : userToFind.getFriendOf()){
             UserDto userDto = new UserDto();
 
-            userDto.setId(u.getId());
+            userDto.setId(u.getUserId());
             userDto.setNombre(u.getNombre());
             userDto.setApellido(u.getApellido());
 
@@ -265,10 +265,10 @@ public class UserService implements IUserService{
 
         List<Trip> publicTripsList;
         if(title != null){
-            publicTripsList = tripRepository.findByOwnerAndAccessibilityAndTitleContaining(userToFind, true, title);
+            publicTripsList = tripRepository.findByOwnerAndAccessibilityAndTitleContaining(userToFind, Trip.accessType.PUBLIC, title);
         }
         else {
-            publicTripsList = tripRepository.findByOwnerAndAccessibility(userToFind, true);
+            publicTripsList = tripRepository.findByOwnerAndAccessibility(userToFind, Trip.accessType.PUBLIC);
         }
 
         List<TripDto> tripDtoList = new ArrayList<>();
@@ -276,14 +276,14 @@ public class UserService implements IUserService{
         for (Trip trip : publicTripsList){
             TripDto tripDto = new TripDto();
 
-            tripDto.setId(trip.getId());
+            tripDto.setId(trip.getTripId());
             tripDto.setTitle(trip.getTitle());
             tripDto.setDescription(trip.getDescription());
             tripDto.setDepartureDate(trip.getDepartureDate());
             tripDto.setEndDate(trip.getEndDate());
 
             UserDto owner = new UserDto();
-            owner.setId(trip.getOwner().getId());
+            owner.setId(trip.getOwner().getUserId());
             owner.setUsername(trip.getOwner().getUsername());
 
             tripDto.setOwner(owner);
@@ -305,7 +305,7 @@ public class UserService implements IUserService{
         }
 
         long parsedTripID = Long.parseLong(tripID);
-        Optional<Trip> optionalTriptrip = tripRepository.findById(parsedTripID);
+        Optional<Trip> optionalTriptrip = tripRepository.findByTripIdAndAccessibility(parsedTripID, Trip.accessType.PUBLIC);
 
         Trip trip = optionalTriptrip.orElseThrow(() -> new ResourceNotFoundException("Viaje no encontrado"));
 
@@ -314,14 +314,14 @@ public class UserService implements IUserService{
         }
 
         TripDto tripDto = new TripDto();
-        tripDto.setId(trip.getId());
+        tripDto.setId(trip.getTripId());
         tripDto.setTitle(trip.getTitle());
         tripDto.setDescription(trip.getDescription());
         tripDto.setDepartureDate(trip.getDepartureDate());
         tripDto.setEndDate(trip.getEndDate());
 
         UserDto owner = new UserDto();
-        owner.setId(trip.getOwner().getId());
+        owner.setId(trip.getOwner().getUserId());
         owner.setUsername(trip.getOwner().getUsername());
 
         tripDto.setOwner(owner);

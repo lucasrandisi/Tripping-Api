@@ -19,9 +19,9 @@ public interface IUserService {
 
     boolean validatePassword(String username, String password);
 
-    User findUserByEmail(final String email) throws ResourceNotFoundException;
+    User findUserByEmail(final String email);
 
-    User findUserByUsername(final String username) throws ResourceNotFoundException;
+    User findUserByUsername(final String username);
 
     VerificationToken getVerificationToken(String token);
 
