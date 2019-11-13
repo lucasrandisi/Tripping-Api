@@ -8,7 +8,7 @@ public class Interest {
 
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
-    private Integer id;
+    private Long id;
 
     private String description;
 
@@ -18,9 +18,9 @@ public class Interest {
     @ManyToMany(mappedBy = "markerInterests")
     private Set<Marker> markers;
 
-    public int getId() { return id; }
+    public long getId() { return id; }
 
-    public void setId(int id) { this.id = id; }
+    public void setId(long id) { this.id = id; }
 
     public String getDescription() { return description;}
 

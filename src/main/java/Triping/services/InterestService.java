@@ -22,8 +22,5 @@ public class InterestService implements IInterestService {
     @Override
     public void createNewInterest(Interest interest) {
         interestRepository.save(interest);
-
     }
-
-
 }

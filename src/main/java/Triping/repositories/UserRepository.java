@@ -1,6 +1,7 @@
 package Triping.repositories;
 
 
+import Triping.models.Interest;
 import org.springframework.data.repository.CrudRepository;
 
 import Triping.models.User;
@@ -16,4 +17,5 @@ public interface UserRepository extends CrudRepository<User, Long>{
 
     @Override
     void delete(User user);
+
 }

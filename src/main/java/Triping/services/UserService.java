@@ -1,10 +1,14 @@
 package Triping.services;
 
 import Triping.dto.AccountDto;
+import Triping.dto.InterestDto;
+import Triping.models.Interest;
 import Triping.models.User;
 import Triping.models.VerificationToken;
+import Triping.repositories.InterestRepository;
 import Triping.repositories.UserRepository;
 import Triping.repositories.VerificationTokenRepository;
+import Triping.utils.exceptions.AlredyAddedException;
 import Triping.utils.exceptions.ResourceNotFoundException;
 import Triping.utils.exceptions.UserAlreadyExistException;
 
@@ -14,7 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.*;
 
 @Service
 @Transactional
@@ -25,6 +29,9 @@ public class UserService implements IUserService{
 
     @Autowired
     private VerificationTokenRepository tokenRepository;
+
+    @Autowired
+    private InterestRepository interestRepository;
 
 
     /* ~~~~~~~~~~ API SERVICES ~~~~~~~~~~~~~ */
@@ -122,5 +129,48 @@ public class UserService implements IUserService{
         }else{
             throw new ResourceNotFoundException();
         }
+    }
+
+
+    @Override
+    public Set<InterestDto> getInterests(User currentUser){
+        Set<InterestDto> userInterests = new LinkedHashSet<>();
+
+        for(Interest interest : currentUser.getUserInterests()){
+            String description = interest.getDescription();
+            Long id = interest.getId();
+            userInterests.add( new InterestDto(id, description));
+        }
+
+        return userInterests;
+    }
+
+    @Override
+    public void addInterest(User currentUser, String id) throws ResourceNotFoundException, AlredyAddedException {
+        long interestID = Long.parseLong(id);
+        Optional<Interest> interestSearch = interestRepository.findById(interestID);
+
+        Interest interestToAdd = interestSearch.orElseThrow(() -> new ResourceNotFoundException("Interés no encontrado"));
+
+        if(currentUser.getUserInterests().contains(interestToAdd)){
+            throw new AlredyAddedException("El interés ya se encuentra agregado al usuario");
+        }
+
+        currentUser.getUserInterests().add(interestToAdd);
+
+        userRepository.save(currentUser);
+    }
+
+    public void removeInterest(User currentUser, String id) throws ResourceNotFoundException {
+        long interestID = Long.parseLong(id);
+        Optional<Interest> interestSearch = interestRepository.findById(interestID);
+
+        Interest interestToRemove = interestSearch.orElseThrow(() -> new ResourceNotFoundException("Interés no encontrado"));
+
+        if(!currentUser.getUserInterests().contains((interestToRemove))){
+            throw new ResourceNotFoundException("El interés no pertenece al usuario");
+        }
+
+        currentUser.getUserInterests().remove(interestToRemove);
     }
 }
