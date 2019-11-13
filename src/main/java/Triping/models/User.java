@@ -10,7 +10,7 @@ import java.util.*;
 public class User {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
-    private Long id;
+    private Long userId;
 
     @NaturalId
     @Column(unique = true)
@@ -26,16 +26,16 @@ public class User {
 
     @ManyToMany
     @JoinTable(name = "user_friends",
-            joinColumns = @JoinColumn(name="userID", referencedColumnName = "id"),
-            inverseJoinColumns=@JoinColumn(name="friendID", referencedColumnName = "id"))
+            joinColumns = @JoinColumn(name="userID", referencedColumnName = "userId"),
+            inverseJoinColumns=@JoinColumn(name="friendID", referencedColumnName = "userId"))
     @JsonIgnoreProperties({"friends", "friendOF"})
     private List<User> friends;
 
 
     @ManyToMany
     @JoinTable(name="user_friends",
-            joinColumns=@JoinColumn(name="friendID", referencedColumnName = "id"),
-            inverseJoinColumns=@JoinColumn(name="userID", referencedColumnName = "id"))
+            joinColumns=@JoinColumn(name="friendID", referencedColumnName = "userId"),
+            inverseJoinColumns=@JoinColumn(name="userID", referencedColumnName = "userId"))
     @JsonIgnoreProperties({"friends", "friendOF"})
     private List<User> friendOf;
 
@@ -70,9 +70,9 @@ public class User {
     }
 
 
-    public Long getId() { return id; }
+    public Long getId() { return userId; }
 
-    public void setId(Long id) { this.id = id; }
+    public void setId(Long id) { this.userId = id; }
 
     public String getUsername() {
         return username;

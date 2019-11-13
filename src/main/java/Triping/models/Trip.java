@@ -20,7 +20,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 public class Trip {
 
     @Id @GeneratedValue
-    private Long id;
+    private Long tripId;
 
     private String title;
     private String description;
@@ -36,7 +36,7 @@ public class Trip {
     private Set<TripParty> contributingUsers;
 
     @ManyToOne
-    @JoinColumn(name="user_id", referencedColumnName = "id")
+    @JoinColumn(name="user_id", referencedColumnName = "userId")
     @JsonIgnoreProperties("ownedTrips")
     private User owner;
 
@@ -49,9 +49,9 @@ public class Trip {
         throw new NotImplementedException();
     }
 
-    public Long getId() { return id; }
+    public Long getId() { return tripId; }
 
-    public void setId(Long id) { this.id = id;}
+    public void setId(Long id) { this.tripId = id;}
 
     public boolean isAccessibility() { return accessibility; }
 

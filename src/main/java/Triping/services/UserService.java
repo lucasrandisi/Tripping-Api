@@ -45,7 +45,7 @@ public class UserService implements IUserService{
 
     // ----------------   Registration    ----------------
     @Override
-    public User registerNewUserAccount(final AccountDto accountDto) throws ResourceNotFoundException {
+    public User registerNewUserAccount(final AccountDto accountDto) {
         if (this.findUserByEmail(accountDto.getEmail()) != null) {
             throw new UserAlreadyExistsException("Ya existe una cuenta registrada con " + accountDto.getEmail());
         }
@@ -96,25 +96,13 @@ public class UserService implements IUserService{
 
     // ----------------   Find methods    ----------------
     @Override
-    public User findUserByEmail(final String email) throws ResourceNotFoundException {
-        User user = userRepository.findByUsername(email);
-
-        if(user == null) {
-            throw  new ResourceNotFoundException("Usuario no encontrado");
-        }
-
-        return user;
+    public User findUserByEmail(final String email) {
+        return userRepository.findByEmail(email);
     }
 
     @Override
-    public User findUserByUsername(String username) throws ResourceNotFoundException {
-        User user = userRepository.findByUsername(username);
-
-        if(user == null) {
-            throw  new ResourceNotFoundException("Usuario no encontrado");
-        }
-
-        return user;
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username);
     }
 
 
@@ -124,6 +112,10 @@ public class UserService implements IUserService{
     @Override
     public void followUser(User currentUser, String toFollowUsername) throws ResourceNotFoundException, AlredyAddedException, SameEntityException {
         User toFollowUser = findUserByUsername(toFollowUsername);
+
+        if (toFollowUser == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
 
         if (currentUser == toFollowUser){
             throw new SameEntityException("Error al intentar seguir a uno mismo");
@@ -141,6 +133,10 @@ public class UserService implements IUserService{
     @Override
     public void unfollowUser(User currentUser, String toUnfollowUsername) throws ResourceNotFoundException, SameEntityException {
         User toUnfollowUser = findUserByUsername(toUnfollowUsername);
+
+        if (toUnfollowUser == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
 
         if (currentUser == toUnfollowUser) {
             throw new SameEntityException("Error al intentar dejar de seguir a uno mismo");
@@ -202,6 +198,10 @@ public class UserService implements IUserService{
     public UserDto getProfile(String username) throws ResourceNotFoundException {
         User userToFind = findUserByUsername(username);
 
+        if (userToFind == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
+
         UserDto userDto = new UserDto();
         userDto.setNombre(userToFind.getNombre());
         userDto.setApellido(userToFind.getApellido());
@@ -214,6 +214,10 @@ public class UserService implements IUserService{
     @Override
     public List<UserDto> getFollowed(String username) throws ResourceNotFoundException {
         User userToFind = findUserByUsername(username);
+
+        if (userToFind == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
 
         List<UserDto> followedUsers = new ArrayList<>();
         for(User u : userToFind.getFriends()){
@@ -233,6 +237,10 @@ public class UserService implements IUserService{
     public List<UserDto> getFollowers(String username) throws ResourceNotFoundException {
         User userToFind = findUserByUsername(username);
 
+        if (userToFind == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
+
         List<UserDto> followers = new ArrayList<>();
         for(User u : userToFind.getFriendOf()){
             UserDto userDto = new UserDto();
@@ -250,8 +258,12 @@ public class UserService implements IUserService{
     @Override
     public List<TripDto> getTrips(String username, String title) throws ResourceNotFoundException {
         User userToFind = findUserByUsername(username);
-        List<Trip> publicTripsList;
 
+        if (userToFind == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
+
+        List<Trip> publicTripsList;
         if(title != null){
             publicTripsList = tripRepository.findByOwnerAndAccessibilityAndTitleContaining(userToFind, true, title);
         }
@@ -259,7 +271,7 @@ public class UserService implements IUserService{
             publicTripsList = tripRepository.findByOwnerAndAccessibility(userToFind, true);
         }
 
-        List<TripDto> tripDtoList = new ArrayList<TripDto>();
+        List<TripDto> tripDtoList = new ArrayList<>();
 
         for (Trip trip : publicTripsList){
             TripDto tripDto = new TripDto();
@@ -271,7 +283,7 @@ public class UserService implements IUserService{
             tripDto.setEndDate(trip.getEndDate());
 
             UserDto owner = new UserDto();
-            owner.setId(trip.getOwner().getId());;
+            owner.setId(trip.getOwner().getId());
             owner.setUsername(trip.getOwner().getUsername());
 
             tripDto.setOwner(owner);
@@ -287,6 +299,10 @@ public class UserService implements IUserService{
     @Override
     public TripDto getTrip(String username, String tripID) throws ResourceNotFoundException {
         User userToFind = findUserByUsername(username);
+
+        if (userToFind == null) {
+            throw new ResourceNotFoundException("Usuario no encontrado");
+        }
 
         long parsedTripID = Long.parseLong(tripID);
         Optional<Trip> optionalTriptrip = tripRepository.findById(parsedTripID);
@@ -305,7 +321,7 @@ public class UserService implements IUserService{
         tripDto.setEndDate(trip.getEndDate());
 
         UserDto owner = new UserDto();
-        owner.setId(trip.getOwner().getId());;
+        owner.setId(trip.getOwner().getId());
         owner.setUsername(trip.getOwner().getUsername());
 
         tripDto.setOwner(owner);
