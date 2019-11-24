@@ -11,7 +11,7 @@ import java.io.Serializable;
 @PasswordMatches
 public class AccountDto implements Serializable {
 
-    @ValidPassword
+    //@ValidPassword
     @NotNull @NotEmpty
     private String password;
 
