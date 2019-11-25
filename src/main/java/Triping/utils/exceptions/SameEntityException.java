@@ -1,6 +1,6 @@
 package Triping.utils.exceptions;
 
-public class SameEntityException extends Exception {
+public class SameEntityException extends BadRequestException {
     public SameEntityException(final String message) {
         super(message);
     }

@@ -45,4 +45,6 @@ public interface IUserService {
     TripDto getTrip(String username, String tripID) throws ResourceNotFoundException;
 
     void changePassword(User currentUser, PasswordDto passwordDto) throws SameEntityException;
+
+    void ResendVerificationToken(User currentUser) throws AlredyEnabledException;
 }

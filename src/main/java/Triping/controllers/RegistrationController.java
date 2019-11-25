@@ -7,11 +7,13 @@ import Triping.models.VerificationToken;
 import Triping.services.specifications.IUserService;
 import Triping.tasks.OnRegistrationCompleteEvent;
 import Triping.utils.GenericResponse;
+import Triping.utils.exceptions.AlredyEnabledException;
 import Triping.utils.exceptions.NotImplementedException;
 
 import Triping.utils.exceptions.SameEntityException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -29,8 +31,9 @@ public class RegistrationController {
     @Autowired
     private IUserService userService;
 
-    @Autowired //Triggers async execution of backend tasks
+    @Autowired
     private ApplicationEventPublisher eventPublisher;
+
 
     /**
      *Registration of new account
@@ -70,6 +73,7 @@ public class RegistrationController {
         if(verificationToken.isExpired()){
             return new ResponseEntity<>("Expired token", HttpStatus.BAD_REQUEST);
         }
+
         User user = verificationToken.getUser();
         user.setEnabled(true);
         userService.saveUser(user);
@@ -77,10 +81,14 @@ public class RegistrationController {
         return new ResponseEntity<>("User account has been activated", HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/user/resendRegistrationToken")
-    @ResponseBody
-    public GenericResponse resendRegistrationToken(){
-        throw new NotImplementedException();
+    @PostMapping(path = "/user/resendRegistrationToken")
+    public ResponseEntity<String> resendRegistrationToken() throws AlredyEnabledException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
+
+        userService.ResendVerificationToken(currentUser);
+
+        return new ResponseEntity<>("Email reenviado", HttpStatus.OK);
     }
 
     @PostMapping(path="/user/resetPassword")

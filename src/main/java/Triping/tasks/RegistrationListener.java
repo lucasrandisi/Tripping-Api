@@ -31,9 +31,17 @@ public class RegistrationListener {
     @Async
     public void confirmRegistration(OnRegistrationCompleteEvent event) {
         //Create and persist token
+
         User user = event.getUser();
-        String token = UUID.randomUUID().toString();
-        userService.createVerificationToken(user, token);
+        String token;
+
+        if(event.getVerificationToken() == null) {
+            token = UUID.randomUUID().toString();
+            userService.createVerificationToken(user, token);
+        }
+        else{
+            token = event.getVerificationToken().getToken();
+        }
 
         String recipientAddress = user.getEmail();
         String from = env.getProperty("support.email");

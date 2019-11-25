@@ -4,6 +4,7 @@ import java.util.Date;
 
 import Triping.utils.ErrorDetails;
 import Triping.utils.exceptions.AlredyAddedException;
+import Triping.utils.exceptions.BadRequestException;
 import Triping.utils.exceptions.ResourceNotFoundException;
 import Triping.utils.exceptions.SameEntityException;
 import org.springframework.http.HttpStatus;
@@ -14,14 +15,8 @@ import org.springframework.web.context.request.WebRequest;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(SameEntityException.class)
-    public ResponseEntity<?> alredyAddedException(SameEntityException ex, WebRequest request) {
-        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
-        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
-    }
-
-    @ExceptionHandler(AlredyAddedException.class)
-    public ResponseEntity<?> alredyAddedException(AlredyAddedException ex, WebRequest request) {
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<?> badRequestException(BadRequestException ex, WebRequest request) {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
     }

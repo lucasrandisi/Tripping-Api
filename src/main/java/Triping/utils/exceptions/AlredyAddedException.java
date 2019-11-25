@@ -1,11 +1,6 @@
 package Triping.utils.exceptions;
 
-
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
-
-
-public class AlredyAddedException extends  Exception {
+public class AlredyAddedException extends  BadRequestException {
     public AlredyAddedException(final String message) {
         super(message);
     }

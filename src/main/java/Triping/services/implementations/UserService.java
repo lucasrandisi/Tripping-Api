@@ -10,13 +10,17 @@ import Triping.repositories.TripRepository;
 import Triping.repositories.UserRepository;
 import Triping.repositories.VerificationTokenRepository;
 import Triping.services.specifications.IUserService;
+import Triping.tasks.OnRegistrationCompleteEvent;
 import Triping.utils.exceptions.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.*;
 
@@ -35,6 +39,9 @@ public class UserService implements IUserService {
 
     @Autowired
     private TripRepository tripRepository;
+
+    @Autowired
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
     public void saveUser(User user) {
@@ -70,6 +77,18 @@ public class UserService implements IUserService {
         return tokenRepository.findByToken(verificationToken);
     }
 
+    @Override
+    public void ResendVerificationToken(User currentUser) throws AlredyEnabledException {
+        if(currentUser.isEnabled()){
+            throw new AlredyEnabledException("El usuario ya se encuentra habilitao");
+        }
+
+        VerificationToken expiredToken = tokenRepository.findByUser(currentUser);
+        expiredToken.updateToken();
+
+        String appUrl = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
+        applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(currentUser, appUrl, expiredToken));
+    }
 
 
     @Override
