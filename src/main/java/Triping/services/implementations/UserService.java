@@ -1,9 +1,6 @@
-package Triping.services;
+package Triping.services.implementations;
 
-import Triping.dto.AccountDto;
-import Triping.dto.InterestDto;
-import Triping.dto.TripDto;
-import Triping.dto.UserDto;
+import Triping.dto.*;
 import Triping.models.Interest;
 import Triping.models.Trip;
 import Triping.models.User;
@@ -12,6 +9,7 @@ import Triping.repositories.InterestRepository;
 import Triping.repositories.TripRepository;
 import Triping.repositories.UserRepository;
 import Triping.repositories.VerificationTokenRepository;
+import Triping.services.specifications.IUserService;
 import Triping.utils.exceptions.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +22,7 @@ import java.util.*;
 
 @Service
 @Transactional
-public class UserService implements IUserService{
+public class UserService implements IUserService {
 
     @Autowired
     private UserRepository userRepository;
@@ -329,5 +327,18 @@ public class UserService implements IUserService{
         tripDto.setContributingUsers(trip.getContributingUsers());
 
         return tripDto;
+    }
+
+
+    public void changePassword(User currentUser, PasswordDto passwordDto) throws SameEntityException {
+        BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
+
+        if (bcryptPasswordEncoder.matches(passwordDto.getPassword(), currentUser.getPassword()) ){
+            throw new SameEntityException("El nuevo valor no puede coincidir con el anterior");
+        }
+
+        String encryptedPassword = bcryptPasswordEncoder.encode(passwordDto.getPassword());
+        currentUser.setPassword(encryptedPassword);
+        userRepository.save(currentUser);
     }
 }

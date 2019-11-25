@@ -1,10 +1,11 @@
-package Triping.services;
+package Triping.services.implementations;
 
 import Triping.models.InvitationToken;
 import Triping.models.Trip;
 import Triping.models.TripParty;
 import Triping.models.User;
 import Triping.repositories.*;
+import Triping.services.specifications.ITripService;
 import Triping.utils.exceptions.AccessDeniedException;
 import Triping.utils.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ import java.util.List;
 
 @Service
 @Transactional
-public class TripService implements ITripService{
+public class TripService implements ITripService {
 
     @Autowired
     private TripRepository tripRepository;

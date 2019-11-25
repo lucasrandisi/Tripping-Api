@@ -1,7 +1,7 @@
 package Triping.tasks;
 
 import Triping.models.User;
-import Triping.services.IUserService;
+import Triping.services.specifications.IUserService;
 
 import Triping.utils.EmailBuilder;
 import org.springframework.beans.factory.annotation.Autowired;

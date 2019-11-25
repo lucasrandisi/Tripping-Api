@@ -1,7 +1,7 @@
 package Triping.controllers;
 
 import Triping.dto.AuthDto;
-import Triping.services.IUserService;
+import Triping.services.specifications.IUserService;
 import Triping.utils.GenericResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,17 +1,21 @@
 package Triping.controllers;
 
 import Triping.dto.AccountDto;
+import Triping.dto.PasswordDto;
 import Triping.models.User;
 import Triping.models.VerificationToken;
-import Triping.services.IUserService;
+import Triping.services.specifications.IUserService;
 import Triping.tasks.OnRegistrationCompleteEvent;
 import Triping.utils.GenericResponse;
 import Triping.utils.exceptions.NotImplementedException;
 
+import Triping.utils.exceptions.SameEntityException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -84,8 +88,13 @@ public class RegistrationController {
         throw new NotImplementedException();
     }
 
-    @PostMapping(path="/user/changePassword")
-    public GenericResponse changePassword(){
-        throw new NotImplementedException();
+    @PostMapping("/user/changePassword")
+    public ResponseEntity<String> changePassword(@Valid @RequestBody PasswordDto passwordDto) throws SameEntityException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
+
+        userService.changePassword(currentUser, passwordDto);
+
+        return new ResponseEntity<>("Contraseña cambiada", HttpStatus.OK);
     }
 }
