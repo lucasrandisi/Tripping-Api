@@ -32,83 +32,20 @@ public class UserService implements IUserService {
     private UserRepository userRepository;
 
     @Autowired
-    private VerificationTokenRepository tokenRepository;
-
-    @Autowired
     private InterestRepository interestRepository;
 
     @Autowired
     private TripRepository tripRepository;
 
-    @Autowired
-    private ApplicationEventPublisher applicationEventPublisher;
+
+
+    // ----------------   Save    ----------------
 
     @Override
     public void saveUser(User user) {
         userRepository.save(user);
     }
 
-    // ----------------   Registration    ----------------
-    @Override
-    public User registerNewUserAccount(final AccountDto accountDto) {
-        if (this.findUserByEmail(accountDto.getEmail()) != null) {
-            throw new UserAlreadyExistsException("Ya existe una cuenta registrada con " + accountDto.getEmail());
-        }
-
-        if (this.findUserByUsername(accountDto.getUsername()) != null) {
-            throw new UserAlreadyExistsException("Ya existe una cuenta registrada con nombre de usuario " + accountDto.getUsername());
-        }
-
-        //Create new user account deactivated
-        final User user = new User();
-        user.setUsername(accountDto.getUsername());
-        user.setEmail(accountDto.getEmail());
-
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String hashedPassword = passwordEncoder.encode(accountDto.getPassword());
-
-        user.setPassword(hashedPassword);
-
-        return (userRepository.save(user));
-    }
-
-    @Override
-    public VerificationToken getVerificationToken(String verificationToken) {
-        return tokenRepository.findByToken(verificationToken);
-    }
-
-    @Override
-    public void ResendVerificationToken(User currentUser) throws AlredyEnabledException {
-        if(currentUser.isEnabled()){
-            throw new AlredyEnabledException("El usuario ya se encuentra habilitao");
-        }
-
-        VerificationToken expiredToken = tokenRepository.findByUser(currentUser);
-        expiredToken.updateToken();
-
-        String appUrl = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
-        applicationEventPublisher.publishEvent(new OnRegistrationCompleteEvent(currentUser, appUrl, expiredToken));
-    }
-
-
-    @Override
-    public void createVerificationToken(final User user, final String token) {
-        VerificationToken verificationToken = new VerificationToken(user, token);
-        tokenRepository.save(verificationToken);
-    }
-
-    // ----------------   Log in    ----------------
-    public boolean validatePassword(String username, String password){
-        User user = userRepository.findByUsername(username);
-        if (user == null){
-            return false;
-        }
-
-        String hashedPassword = user.getPassword();
-
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return passwordEncoder.matches(password, hashedPassword);
-    }
 
 
     // ----------------   Find methods    ----------------
@@ -349,15 +286,5 @@ public class UserService implements IUserService {
     }
 
 
-    public void changePassword(User currentUser, PasswordDto passwordDto) throws SameEntityException {
-        BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
 
-        if (bcryptPasswordEncoder.matches(passwordDto.getPassword(), currentUser.getPassword()) ){
-            throw new SameEntityException("El nuevo valor no puede coincidir con el anterior");
-        }
-
-        String encryptedPassword = bcryptPasswordEncoder.encode(passwordDto.getPassword());
-        currentUser.setPassword(encryptedPassword);
-        userRepository.save(currentUser);
-    }
 }

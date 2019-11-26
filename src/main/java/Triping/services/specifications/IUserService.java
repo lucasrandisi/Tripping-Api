@@ -10,19 +10,11 @@ import java.util.Set;
 
 public interface IUserService {
 
-    User registerNewUserAccount(AccountDto accountDto) throws UserAlreadyExistsException, ResourceNotFoundException;
-
-    boolean validatePassword(String username, String password);
-
     User findUserByEmail(final String email);
 
     User findUserByUsername(final String username);
 
-    VerificationToken getVerificationToken(String token);
-
     void saveUser(User user);
-
-    void createVerificationToken(User user, String token);
 
     void followUser(User currentUser, String username) throws ResourceNotFoundException, AlredyAddedException, SameEntityException;
 
@@ -44,7 +36,4 @@ public interface IUserService {
 
     TripDto getTrip(String username, String tripID) throws ResourceNotFoundException;
 
-    void changePassword(User currentUser, PasswordDto passwordDto) throws SameEntityException;
-
-    void ResendVerificationToken(User currentUser) throws AlredyEnabledException;
 }

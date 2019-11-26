@@ -23,15 +23,13 @@ public class VerificationToken {
         INVALID, EXPIRED, VALID
     }
 
-
-    public VerificationToken(final String token) {
-        this.token = token;
-        this.expiryDate = calculateExpiryDate(EXPIRATION);
+    public VerificationToken() {
     }
 
     public VerificationToken(final User user, final String token) {
-        this(token);
+        this.token = token;
         this.user = user;
+        this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
     private Date calculateExpiryDate(int expiryTimeInMinutes) {

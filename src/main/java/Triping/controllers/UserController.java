@@ -122,7 +122,4 @@ public class UserController {
         return new ResponseEntity<>(userFriends, HttpStatus.OK);
     }
 
-    // ------------------ User's  sensitive data ------------------
-
-
 }

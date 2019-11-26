@@ -1,6 +1,7 @@
 package Triping.tasks;
 
 import Triping.models.User;
+import Triping.services.specifications.IAccountService;
 import Triping.services.specifications.IUserService;
 
 import Triping.utils.EmailBuilder;
@@ -19,7 +20,7 @@ import java.util.UUID;
 public class RegistrationListener {
 
     @Autowired
-    private IUserService userService;
+    private IAccountService accountService;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -37,7 +38,7 @@ public class RegistrationListener {
 
         if(event.getVerificationToken() == null) {
             token = UUID.randomUUID().toString();
-            userService.createVerificationToken(user, token);
+            accountService.createVerificationToken(user, token);
         }
         else{
             token = event.getVerificationToken().getToken();
