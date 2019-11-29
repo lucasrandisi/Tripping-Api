@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Date;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 //Server scheduled task that purges all expired tokens from the database
 @Service
@@ -27,9 +29,15 @@ public class TokenPurgeTask {
     PasswordResetTokenRepository passwordTokenRepository;
     */
 
-    @Scheduled(cron = "${purge.cron.expression}") //purge.cron.expression at application.properties
-    public void purgeExpired() {
+    private final static Logger logger = Logger.getLogger(TokenPurgeTask.class.getName());
 
+    /**
+     * Task that purges all expired tokens from the database at a fixed time t
+     * where t is purge.cron.expression defined at application.properties
+     */
+    @Scheduled(cron = "${purge.cron.expression}")
+    public void purgeExpired() {
+        logger.info("[TASK] All expired tokens were deleted");
         Date now = Date.from(Instant.now());
 
         //passwordTokenRepository.deleteAllExpiredSince(now);
