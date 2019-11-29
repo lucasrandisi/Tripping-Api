@@ -1,10 +1,13 @@
 package Triping.dto;
 
 import Triping.validation.ValidEmail;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 
+@Getter @Setter
 public class EmailDto {
 
     @ValidEmail
@@ -14,20 +17,4 @@ public class EmailDto {
     @NotNull
     @NotEmpty
     private String password;
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }

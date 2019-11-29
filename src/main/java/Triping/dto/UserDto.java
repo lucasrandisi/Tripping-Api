@@ -1,62 +1,26 @@
 package Triping.dto;
 
 import Triping.models.User;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.util.List;
-
+@Getter
+@Setter
 public class UserDto {
     private Long id;
-    private String nombre;
-    private String apellido;
+    private String name;
+    private String surname;
     private String username;
     private String email;
     private byte[] userImage;
 
-    public String getNombre() {
-        return nombre;
-    }
+    public UserDto(User user){
+        this.setId(user.getUserId());
+        this.setUsername(user.getSurname());
+        this.setEmail(user.getEmail());
+        this.setUserImage(user.getUserImage());
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getApellido() {
-        return apellido;
-    }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public byte[] getUserImage() {
-        return userImage;
-    }
-
-    public void setUserImage(byte[] userImage) {
-        this.userImage = userImage;
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
+        this.setName(user.getName());
+        this.setSurname(user.getSurname());
     }
 }

@@ -1,35 +1,22 @@
 package Triping.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 import java.io.Serializable;
 import java.util.Objects;
 
 @Embeddable
-public
-class TripPartyKey implements Serializable {
+@Getter @Setter
+public class TripPartyKey implements Serializable {
 
     @Column(name = "trip_id")
     Long tripId;
 
     @Column(name = "user_id")
     Long userId;
-
-    public Long getTripId() {
-        return tripId;
-    }
-
-    public void setTripId(Long tripId) {
-        this.tripId = tripId;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     public TripPartyKey(Long tripId, Long userId) {
         this.tripId = tripId;

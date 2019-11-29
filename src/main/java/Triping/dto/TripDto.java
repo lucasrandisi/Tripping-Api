@@ -1,13 +1,17 @@
 package Triping.dto;
 
 import Triping.models.Itinerary;
+import Triping.models.Trip;
 import Triping.models.TripParty;
 import Triping.models.User;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.sql.Date;
 import java.util.List;
 import java.util.Set;
 
+@Getter @Setter
 public class TripDto {
     private Long id;
     private String title;
@@ -20,67 +24,16 @@ public class TripDto {
     private List<Itinerary> itineraries;
     private Set<TripParty> contributingUsers;
 
-    public Long getId() {
-        return id;
-    }
+    public TripDto(Trip trip) {
+        this.setId(trip.getTripId());
+        this.setTitle(trip.getTitle());
+        this.setDescription(trip.getDescription());
+        this.setDepartureDate(trip.getDepartureDate());
+        this.setEndDate(trip.getEndDate());
 
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Date getDepartureDate() {
-        return departureDate;
-    }
-
-    public void setDepartureDate(Date departureDate) {
-        this.departureDate = departureDate;
-    }
-
-    public Date getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(Date endDate) {
-        this.endDate = endDate;
-    }
-
-    public UserDto getOwner() {
-        return owner;
-    }
-
-    public void setOwner(UserDto owner) {
-        this.owner = owner;
-    }
-
-    public List<Itinerary> getItineraries() {
-        return itineraries;
-    }
-
-    public void setItineraries(List<Itinerary> itineraries) {
-        this.itineraries = itineraries;
-    }
-
-    public Set<TripParty> getContributingUsers() {
-        return contributingUsers;
-    }
-
-    public void setContributingUsers(Set<TripParty> contributingUsers) {
-        this.contributingUsers = contributingUsers;
+        UserDto owner = new UserDto(trip.getOwner());
+        this.setOwner(owner);
+        this.setItineraries(trip.getItineraries());
+        this.setContributingUsers(trip.getContributingUsers());
     }
 }

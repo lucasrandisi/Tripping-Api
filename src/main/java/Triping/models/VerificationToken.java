@@ -1,15 +1,20 @@
 package Triping.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 
 @Entity
+@Getter @Setter
 public class VerificationToken {
     private static final int EXPIRATION = 60 * 24;
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)
@@ -46,30 +51,6 @@ public class VerificationToken {
 
     public void updateToken() {
         this.expiryDate = calculateExpiryDate(EXPIRATION);
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public Date getExpiryDate() {
-        return expiryDate;
-    }
-
-    public void setExpiryDate(Date expiryDate) {
-        this.expiryDate = expiryDate;
     }
 
     @Override

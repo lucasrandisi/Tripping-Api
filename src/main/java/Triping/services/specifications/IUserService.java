@@ -20,11 +20,11 @@ public interface IUserService {
 
     void unfollowUser(User currentUser, String username) throws ResourceNotFoundException, SameEntityException;
 
-    void addInterest(User currentUser, String id) throws ResourceNotFoundException, AlredyAddedException;
+    void addInterest(User currentUser, Long id) throws ResourceNotFoundException, AlredyAddedException;
 
     Set<InterestDto> getInterests(User currentUser);
 
-    void removeInterest(User currentUser, String id) throws ResourceNotFoundException;
+    void removeInterest(User currentUser, Long id) throws ResourceNotFoundException;
 
     UserDto getProfile(String username) throws ResourceNotFoundException;
 
@@ -34,6 +34,6 @@ public interface IUserService {
 
     List<TripDto> getTrips(String username, String title) throws ResourceNotFoundException;
 
-    TripDto getTrip(String username, String tripID) throws ResourceNotFoundException;
+    TripDto getTrip(String username, Long tripID) throws ResourceNotFoundException;
 
 }

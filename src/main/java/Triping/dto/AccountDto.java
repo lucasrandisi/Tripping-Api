@@ -3,11 +3,14 @@ package Triping.dto;
 import Triping.validation.PasswordMatches;
 import Triping.validation.ValidEmail;
 import Triping.validation.ValidPassword;
+import lombok.Getter;
+import lombok.Setter;
 
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
+@Getter @Setter
 @PasswordMatches
 public class AccountDto implements Serializable {
 
@@ -24,34 +27,6 @@ public class AccountDto implements Serializable {
 
     @NotNull @NotEmpty
     private String username;
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(final String password) {
-        this.password = password;
-    }
-
-    public String getMatchingPassword() {
-        return matchingPassword;
-    }
-
-    public void setMatchingPassword(final String matchingPassword) {
-        this.matchingPassword = matchingPassword;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(final String email) {
-        this.email = email;
-    }
-
-    public String getUsername() { return username; }
-
-    public void setUsername(String username) { this.username = username; }
 
     @Override
     public String toString() {

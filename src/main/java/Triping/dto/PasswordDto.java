@@ -1,9 +1,13 @@
 package Triping.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
+@Getter @Setter
 public class PasswordDto  implements Serializable {
 
     @NotNull
@@ -15,19 +19,4 @@ public class PasswordDto  implements Serializable {
     @NotEmpty
     private String newPassword;
 
-    public String getOldPassword() {
-        return oldPassword;
-    }
-
-    public void setOldPassword(String oldPassword) {
-        this.oldPassword = oldPassword;
-    }
-
-    public String getNewPassword() {
-        return newPassword;
-    }
-
-    public void setNewPassword(String newPassword) {
-        this.newPassword = newPassword;
-    }
 }
