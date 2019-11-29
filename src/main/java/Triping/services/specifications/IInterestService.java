@@ -1,4 +1,4 @@
-package Triping.services;
+package Triping.services.specifications;
 
 import Triping.models.Interest;
 

@@ -24,19 +24,12 @@ public class VerificationToken {
     }
 
     public VerificationToken() {
-        super();
-    }
-
-    public VerificationToken(final String token) {
-        super();
-
-        this.token = token;
-        this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
     public VerificationToken(final User user, final String token) {
-        this(token);
+        this.token = token;
         this.user = user;
+        this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
     private Date calculateExpiryDate(int expiryTimeInMinutes) {
@@ -49,6 +42,10 @@ public class VerificationToken {
     public boolean isExpired() {
         Calendar cal = Calendar.getInstance();
         return (expiryDate.getTime() - cal.getTime().getTime()) <= 0;
+    }
+
+    public void updateToken() {
+        this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
     public String getToken() {
@@ -73,11 +70,6 @@ public class VerificationToken {
 
     public void setExpiryDate(Date expiryDate) {
         this.expiryDate = expiryDate;
-    }
-
-    public void updateToken(final String token) {
-        this.token = token;
-        this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
     @Override

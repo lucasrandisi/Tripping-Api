@@ -32,6 +32,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.antMatcher("/**")
             .authorizeRequests()
                 .antMatchers(HttpMethod.GET,"/interest/all").permitAll()
+                .antMatchers(HttpMethod.GET,"/verify").permitAll()
                 .antMatchers(HttpMethod.GET, "/*/profile").permitAll()
                 .antMatchers(HttpMethod.GET, "/*/followed").permitAll()
                 .antMatchers(HttpMethod.GET, "/*/followers").permitAll()
@@ -39,9 +40,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.GET, "/*/trips").permitAll()
                 .antMatchers(HttpMethod.GET,"/").permitAll()
 
+
                 .antMatchers(HttpMethod.POST, "/auth", "/user/register" ).permitAll()
+                .antMatchers(HttpMethod.POST,"/logout").permitAll()
 
                 .anyRequest().authenticated()
+            .and()
+                .logout()
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
+                .invalidateHttpSession(true)
+                .deleteCookies("SESSION")
             .and()
                 .csrf().disable();
     }

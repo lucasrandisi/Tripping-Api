@@ -1,8 +1,7 @@
-package Triping.services;
+package Triping.services.specifications;
 
 import Triping.models.InvitationToken;
 import Triping.models.Trip;
-import Triping.models.TripParty;
 import Triping.models.User;
 import Triping.utils.exceptions.ResourceNotFoundException;
 

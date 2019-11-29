@@ -1,11 +1,8 @@
 package Triping.controllers;
 
-import Triping.dto.InterestDto;
-import Triping.dto.TripDto;
-import Triping.dto.UserDto;
-import Triping.models.Trip;
+import Triping.dto.*;
 import Triping.models.User;
-import Triping.services.IUserService;
+import Triping.services.specifications.IUserService;
 import Triping.utils.exceptions.AlredyAddedException;
 import Triping.utils.exceptions.ResourceNotFoundException;
 import Triping.utils.exceptions.SameEntityException;
@@ -16,6 +13,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
@@ -54,7 +52,7 @@ public class UserController {
     // ------------------ Interests ------------------
 
     @GetMapping("/user/interests")
-    public ResponseEntity<Set<InterestDto>> getInterests() throws ResourceNotFoundException {
+    public ResponseEntity<Set<InterestDto>> getInterests() {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
 
@@ -85,7 +83,7 @@ public class UserController {
     }
 
 
-    // ------------------ User's data ------------------
+    // ------------------ User's  public data ------------------
     @GetMapping("/{username}/profile")
     public ResponseEntity<UserDto> profile(@PathVariable String username) throws ResourceNotFoundException {
         UserDto userProfile = userService.getProfile(username);
@@ -123,4 +121,5 @@ public class UserController {
 
         return new ResponseEntity<>(userFriends, HttpStatus.OK);
     }
+
 }

@@ -1,17 +1,24 @@
 package Triping.controllers;
 
 import Triping.dto.AccountDto;
+import Triping.dto.PasswordDto;
 import Triping.models.User;
 import Triping.models.VerificationToken;
-import Triping.services.IUserService;
+import Triping.services.specifications.IAccountService;
+import Triping.services.specifications.IUserService;
 import Triping.tasks.OnRegistrationCompleteEvent;
 import Triping.utils.GenericResponse;
+import Triping.utils.exceptions.AlredyEnabledException;
 import Triping.utils.exceptions.NotImplementedException;
 
+import Triping.utils.exceptions.SameEntityException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -20,23 +27,27 @@ import java.net.URI;
 
 @RestController
 @CrossOrigin
+@RequestMapping(path="/user")
 public class RegistrationController {
 
     @Autowired
     private IUserService userService;
 
-    @Autowired //Triggers async execution of backend tasks
+    @Autowired
     private ApplicationEventPublisher eventPublisher;
+
+    @Autowired
+    IAccountService accountService;
 
     /**
      *Registration of new account
      * @param accountDto
      * @return The URL of created user
      */
-    @PostMapping(path="/user/register")
+    @PostMapping(path="/register")
     public ResponseEntity<?> registerUserAccount(@Valid @RequestBody AccountDto accountDto) {
         try {
-            final User registered = userService.registerNewUserAccount(accountDto);
+            final User registered = accountService.registerNewUserAccount(accountDto);
 
             // Create confirmation token and send confirmation email
             String appUrl = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
@@ -56,16 +67,17 @@ public class RegistrationController {
      * @param token Unique verification token for the account
      * @return Http.OK if account was verified, Http.BAD_REQUEST if invalid or expired
      */
-    @GetMapping(path="/verify")
+    @GetMapping(path="/verifyToken")
     public ResponseEntity<?> confirmRegistration(@RequestParam("token") String token){
 
-        VerificationToken verificationToken = userService.getVerificationToken(token);
+        VerificationToken verificationToken = accountService.getVerificationToken(token);
         if (verificationToken == null) {
             return new ResponseEntity<>("Invalid token", HttpStatus.BAD_REQUEST);
         }
         if(verificationToken.isExpired()){
             return new ResponseEntity<>("Expired token", HttpStatus.BAD_REQUEST);
         }
+
         User user = verificationToken.getUser();
         user.setEnabled(true);
         userService.saveUser(user);
@@ -73,19 +85,5 @@ public class RegistrationController {
         return new ResponseEntity<>("User account has been activated", HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/user/resendRegistrationToken")
-    @ResponseBody
-    public GenericResponse resendRegistrationToken(){
-        throw new NotImplementedException();
-    }
 
-    @PostMapping(path="/user/resetPassword")
-    public GenericResponse resetPassword(){
-        throw new NotImplementedException();
-    }
-
-    @PostMapping(path="/user/changePassword")
-    public GenericResponse changePassword(){
-        throw new NotImplementedException();
-    }
 }

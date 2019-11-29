@@ -2,14 +2,10 @@ package Triping.controllers;
 
 import Triping.models.InvitationToken;
 import Triping.models.Trip;
-import Triping.models.TripParty;
 import Triping.models.User;
-import Triping.services.ITripService;
-import Triping.services.IUserService;
-import Triping.utils.ErrorDetails;
-import Triping.utils.GenericResponse;
+import Triping.services.specifications.ITripService;
+import Triping.services.specifications.IUserService;
 import Triping.utils.exceptions.AccessDeniedException;
-import Triping.utils.exceptions.NotImplementedException;
 
 import Triping.utils.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;

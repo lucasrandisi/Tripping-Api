@@ -1,7 +1,8 @@
 package Triping.tasks;
 
 import Triping.models.User;
-import Triping.services.IUserService;
+import Triping.services.specifications.IAccountService;
+import Triping.services.specifications.IUserService;
 
 import Triping.utils.EmailBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,7 @@ import java.util.UUID;
 public class RegistrationListener {
 
     @Autowired
-    private IUserService userService;
+    private IAccountService accountService;
 
     @Autowired
     private JavaMailSender mailSender;
@@ -31,9 +32,17 @@ public class RegistrationListener {
     @Async
     public void confirmRegistration(OnRegistrationCompleteEvent event) {
         //Create and persist token
+
         User user = event.getUser();
-        String token = UUID.randomUUID().toString();
-        userService.createVerificationToken(user, token);
+        String token;
+
+        if(event.getVerificationToken() == null) {
+            token = UUID.randomUUID().toString();
+            accountService.createVerificationToken(user, token);
+        }
+        else{
+            token = event.getVerificationToken().getToken();
+        }
 
         String recipientAddress = user.getEmail();
         String from = env.getProperty("support.email");

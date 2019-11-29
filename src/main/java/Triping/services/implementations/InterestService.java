@@ -1,8 +1,9 @@
-package Triping.services;
+package Triping.services.implementations;
 
 
 import Triping.models.Interest;
 import Triping.repositories.InterestRepository;
+import Triping.services.specifications.IInterestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

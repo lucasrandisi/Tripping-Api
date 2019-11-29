@@ -1,9 +1,6 @@
-package Triping.services;
+package Triping.services.implementations;
 
-import Triping.dto.AccountDto;
-import Triping.dto.InterestDto;
-import Triping.dto.TripDto;
-import Triping.dto.UserDto;
+import Triping.dto.*;
 import Triping.models.Interest;
 import Triping.models.Trip;
 import Triping.models.User;
@@ -12,25 +9,27 @@ import Triping.repositories.InterestRepository;
 import Triping.repositories.TripRepository;
 import Triping.repositories.UserRepository;
 import Triping.repositories.VerificationTokenRepository;
+import Triping.services.specifications.IUserService;
+import Triping.tasks.OnRegistrationCompleteEvent;
 import Triping.utils.exceptions.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.ApplicationEventMulticaster;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.*;
 
 @Service
 @Transactional
-public class UserService implements IUserService{
+public class UserService implements IUserService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private VerificationTokenRepository tokenRepository;
 
     @Autowired
     private InterestRepository interestRepository;
@@ -38,60 +37,15 @@ public class UserService implements IUserService{
     @Autowired
     private TripRepository tripRepository;
 
+
+
+    // ----------------   Save    ----------------
+
     @Override
     public void saveUser(User user) {
         userRepository.save(user);
     }
 
-    // ----------------   Registration    ----------------
-    @Override
-    public User registerNewUserAccount(final AccountDto accountDto) {
-        if (this.findUserByEmail(accountDto.getEmail()) != null) {
-            throw new UserAlreadyExistsException("Ya existe una cuenta registrada con " + accountDto.getEmail());
-        }
-
-        if (this.findUserByUsername(accountDto.getUsername()) != null) {
-            throw new UserAlreadyExistsException("Ya existe una cuenta registrada con nombre de usuario " + accountDto.getUsername());
-        }
-
-        //Create new user account deactivated
-        final User user = new User();
-        user.setUsername(accountDto.getUsername());
-        user.setEmail(accountDto.getEmail());
-
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        String hashedPassword = passwordEncoder.encode(accountDto.getPassword());
-
-        user.setPassword(hashedPassword);
-
-        return (userRepository.save(user));
-    }
-
-    @Override
-    public VerificationToken getVerificationToken(String verificationToken) {
-        return tokenRepository.findByToken(verificationToken);
-    }
-
-
-
-    @Override
-    public void createVerificationToken(final User user, final String token) {
-        VerificationToken verificationToken = new VerificationToken(user, token);
-        tokenRepository.save(verificationToken);
-    }
-
-    // ----------------   Log in    ----------------
-    public boolean validatePassword(String username, String password){
-        User user = userRepository.findByUsername(username);
-        if (user == null){
-            return false;
-        }
-
-        String hashedPassword = user.getPassword();
-
-        PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-        return passwordEncoder.matches(password, hashedPassword);
-    }
 
 
     // ----------------   Find methods    ----------------
@@ -330,4 +284,7 @@ public class UserService implements IUserService{
 
         return tripDto;
     }
+
+
+
 }

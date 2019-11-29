@@ -1,10 +1,14 @@
 package Triping.controllers;
 
 import Triping.dto.AuthDto;
-import Triping.services.IUserService;
+import Triping.services.specifications.IAccountService;
+import Triping.services.specifications.IUserService;
 import Triping.utils.GenericResponse;
 
+import Triping.utils.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -18,28 +22,23 @@ import javax.validation.Valid;
 @RequestMapping(path="/auth")
 public class LogInController {
     @Autowired
-    private IUserService userService;
+    private IAccountService accountService;
 
 
     @PostMapping
-    public @ResponseBody GenericResponse login(@Valid @RequestBody AuthDto authDto, HttpServletRequest req) {
+    public ResponseEntity<String> login(@Valid @RequestBody AuthDto authDto, HttpServletRequest req) throws ResourceNotFoundException {
         String username = authDto.getUsername();
         String password = authDto.getPassword();
 
-        try {
-            if (userService.validatePassword(username, password)){
+        if (accountService.validateUsernameAndPassword(username, password)){
                 Authentication authentication =  new UsernamePasswordAuthenticationToken(username, null, null);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-                return new GenericResponse("Usuario loggeado");
-            }
-            else{
-                return new GenericResponse("Ni idea ese sujeto");
-            }
-        } catch (Exception e) {
-            return new GenericResponse("Ocurrió un error");
+                return new ResponseEntity<>("Usuario loggeado", HttpStatus.OK);
         }
-
+        else{
+                return new ResponseEntity<>("Contraseña incorrecta", HttpStatus.BAD_REQUEST);
+        }
     }
 
 }

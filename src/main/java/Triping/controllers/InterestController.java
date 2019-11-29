@@ -2,7 +2,7 @@ package Triping.controllers;
 
 
 import Triping.models.Interest;
-import Triping.services.IInterestService;
+import Triping.services.specifications.IInterestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
