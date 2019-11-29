@@ -121,11 +121,11 @@ public class UserService implements IUserService{
             throw new SameEntityException("Error al intentar seguir a uno mismo");
         }
 
-        if(currentUser.getFriends().contains(toFollowUser)) {
+        if(currentUser.getFollowing().contains(toFollowUser)) {
             throw new AlredyAddedException("Ya sigue a este usuario");
         }
 
-        currentUser.getFriends().add(toFollowUser);
+        currentUser.getFollowing().add(toFollowUser);
         userRepository.save(currentUser);
 
     }
@@ -142,11 +142,11 @@ public class UserService implements IUserService{
             throw new SameEntityException("Error al intentar dejar de seguir a uno mismo");
         }
 
-        if(!currentUser.getFriends().contains(toUnfollowUser)) {
+        if(!currentUser.getFollowing().contains(toUnfollowUser)) {
             throw new ResourceNotFoundException("Error al intentar dejar de seguir un usuario al que no se sigue");
         }
 
-        currentUser.getFriends().remove(toUnfollowUser);
+        currentUser.getFollowing().remove(toUnfollowUser);
     }
 
     // ----------------   Interests   ----------------
@@ -165,9 +165,8 @@ public class UserService implements IUserService{
     }
 
     @Override
-    public void addInterest(User currentUser, String id) throws ResourceNotFoundException, AlredyAddedException {
-        long interestID = Long.parseLong(id);
-        Optional<Interest> interestSearch = interestRepository.findById(interestID);
+    public void addInterest(User currentUser,Long id) throws ResourceNotFoundException, AlredyAddedException {
+        Optional<Interest> interestSearch = interestRepository.findById(id);
 
         Interest interestToAdd = interestSearch.orElseThrow(() -> new ResourceNotFoundException("Interés no encontrado"));
 
@@ -180,9 +179,8 @@ public class UserService implements IUserService{
         userRepository.save(currentUser);
     }
 
-    public void removeInterest(User currentUser, String id) throws ResourceNotFoundException {
-        long interestID = Long.parseLong(id);
-        Optional<Interest> interestSearch = interestRepository.findById(interestID);
+    public void removeInterest(User currentUser, Long id) throws ResourceNotFoundException {
+        Optional<Interest> interestSearch = interestRepository.findById(id);
 
         Interest interestToRemove = interestSearch.orElseThrow(() -> new ResourceNotFoundException("Interés no encontrado"));
 
@@ -196,19 +194,12 @@ public class UserService implements IUserService{
     // ----------------   User's Data   ----------------
     @Override
     public UserDto getProfile(String username) throws ResourceNotFoundException {
-        User userToFind = findUserByUsername(username);
+        User user = findUserByUsername(username);
 
-        if (userToFind == null) {
+        if (user == null) {
             throw new ResourceNotFoundException("Usuario no encontrado");
         }
-
-        UserDto userDto = new UserDto();
-        userDto.setName(userToFind.getName());
-        userDto.setSurname(userToFind.getSurname());
-        userDto.setEmail(userToFind.getEmail());
-        userDto.setUserImage(userToFind.getUserImage());
-
-        return userDto;
+        return new UserDto(user);
     }
 
     @Override
@@ -220,16 +211,10 @@ public class UserService implements IUserService{
         }
 
         List<UserDto> followedUsers = new ArrayList<>();
-        for(User u : userToFind.getFriends()){
-            UserDto userDto = new UserDto();
-
-            userDto.setId(u.getUserId());
-            userDto.setName(u.getName());
-            userDto.setSurname(u.getSurname());
-
+        for(User user : userToFind.getFollowing()){
+            UserDto userDto = new UserDto(user);
             followedUsers.add(userDto);
         }
-
         return followedUsers;
     }
 
@@ -242,16 +227,10 @@ public class UserService implements IUserService{
         }
 
         List<UserDto> followers = new ArrayList<>();
-        for(User u : userToFind.getFriendOf()){
-            UserDto userDto = new UserDto();
-
-            userDto.setId(u.getUserId());
-            userDto.setName(u.getName());
-            userDto.setSurname(u.getSurname());
-
+        for(User user : userToFind.getFollowers()){
+            UserDto userDto = new UserDto(user);
             followers.add(userDto);
         }
-
         return followers;
     }
 
@@ -274,60 +253,28 @@ public class UserService implements IUserService{
         List<TripDto> tripDtoList = new ArrayList<>();
 
         for (Trip trip : publicTripsList){
-            TripDto tripDto = new TripDto();
-
-            tripDto.setId(trip.getTripId());
-            tripDto.setTitle(trip.getTitle());
-            tripDto.setDescription(trip.getDescription());
-            tripDto.setDepartureDate(trip.getDepartureDate());
-            tripDto.setEndDate(trip.getEndDate());
-
-            UserDto owner = new UserDto();
-            owner.setId(trip.getOwner().getUserId());
-            owner.setUsername(trip.getOwner().getUsername());
-
-            tripDto.setOwner(owner);
-            tripDto.setItineraries(trip.getItineraries());
-            tripDto.setContributingUsers(trip.getContributingUsers());
-
+            TripDto tripDto = new TripDto(trip);
             tripDtoList.add(tripDto);
         }
-
         return tripDtoList;
     }
 
     @Override
-    public TripDto getTrip(String username, String tripID) throws ResourceNotFoundException {
+    public TripDto getTrip(String username, Long tripId) throws ResourceNotFoundException {
         User userToFind = findUserByUsername(username);
 
         if (userToFind == null) {
             throw new ResourceNotFoundException("Usuario no encontrado");
         }
 
-        long parsedTripID = Long.parseLong(tripID);
-        Optional<Trip> optionalTriptrip = tripRepository.findByTripIdAndAccessibility(parsedTripID, Trip.accessType.PUBLIC);
+        Optional<Trip> optionalTrip = tripRepository.findByTripIdAndAccessibility(tripId, Trip.accessType.PUBLIC);
 
-        Trip trip = optionalTriptrip.orElseThrow(() -> new ResourceNotFoundException("Viaje no encontrado"));
+        Trip trip = optionalTrip.orElseThrow(() -> new ResourceNotFoundException("Viaje no encontrado"));
 
         if (trip.getOwner() != userToFind) {
             throw new ResourceNotFoundException("El viaje no pertenece al usuario");
         }
 
-        TripDto tripDto = new TripDto();
-        tripDto.setId(trip.getTripId());
-        tripDto.setTitle(trip.getTitle());
-        tripDto.setDescription(trip.getDescription());
-        tripDto.setDepartureDate(trip.getDepartureDate());
-        tripDto.setEndDate(trip.getEndDate());
-
-        UserDto owner = new UserDto();
-        owner.setId(trip.getOwner().getUserId());
-        owner.setUsername(trip.getOwner().getUsername());
-
-        tripDto.setOwner(owner);
-        tripDto.setItineraries(trip.getItineraries());
-        tripDto.setContributingUsers(trip.getContributingUsers());
-
-        return tripDto;
+        return new TripDto(trip);
     }
 }

@@ -30,12 +30,12 @@ public class User {
     private String surname;
 
     @ManyToMany
-    @JoinTable(name = "user_friends", joinColumns = @JoinColumn(name="user_id"), inverseJoinColumns=@JoinColumn(name="friend_id"))
+    @JoinTable(name = "followers", joinColumns = @JoinColumn(name="user"), inverseJoinColumns=@JoinColumn(name="followed_user"))
     @JsonBackReference
-    private List<User> friends;
+    private List<User> following;
 
-    @ManyToMany(mappedBy = "friends")
-    private List<User> friendOf;
+    @ManyToMany(mappedBy = "following")
+    private List<User> followers;
 
     @OneToMany(mappedBy = "owner")
     @JsonIgnoreProperties("owner")
