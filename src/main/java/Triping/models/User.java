@@ -1,5 +1,6 @@
 package Triping.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
@@ -12,48 +13,43 @@ import java.util.*;
 @Getter @Setter
 public class User {
     @Id
-    @GeneratedValue(strategy=GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
     @NaturalId
     @Column(unique = true)
     private String username;
 
+    @Column(unique = true)
+    private String email;
+
     private String password;
     private Boolean enabled;
-    private String email;
     private byte[] userImage;
     private String name;
     private String surname;
 
     @ManyToMany
-    @JoinTable(name = "user_friends",
-            joinColumns = @JoinColumn(name="userID", referencedColumnName = "userId"),
-            inverseJoinColumns=@JoinColumn(name="friendID", referencedColumnName = "userId"))
-    @JsonIgnoreProperties({"friends", "friendOF"})
+    @JoinTable(name = "user_friends", joinColumns = @JoinColumn(name="user_id"), inverseJoinColumns=@JoinColumn(name="friend_id"))
+    @JsonBackReference
     private List<User> friends;
 
-
-    @ManyToMany
-    @JoinTable(name="user_friends",
-            joinColumns=@JoinColumn(name="friendID", referencedColumnName = "userId"),
-            inverseJoinColumns=@JoinColumn(name="userID", referencedColumnName = "userId"))
-    @JsonIgnoreProperties({"friends", "friendOF"})
+    @ManyToMany(mappedBy = "friends")
     private List<User> friendOf;
-
 
     @OneToMany(mappedBy = "owner")
     @JsonIgnoreProperties("owner")
     private List<Trip> ownedTrips;
 
-    @OneToMany
+    @OneToMany(mappedBy="owner", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Itinerary> ownedItineraries;
 
-    @OneToMany
+    @OneToMany(mappedBy = "owner", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Marker> customMarkers;
 
     @ManyToMany()
     @JoinTable(name = "users_interests", joinColumns = @JoinColumn(name = "interest_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
+    @JsonBackReference
     private Set<Interest> userInterests;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

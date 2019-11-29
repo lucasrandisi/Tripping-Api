@@ -12,15 +12,18 @@ import java.sql.Time;
 public class ItineraryMarkers implements Serializable {
 
     //ToDo: Implementar comentarios de usuarios
-    @Id
-    @ManyToOne
-    @JoinColumn
-    private Itinerary itinerary;
+    @EmbeddedId
+    private ItineraryMarkerKey id;
 
-    @Id
-    @ManyToOne
-    @JoinColumn
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("marker_id")
+    @JoinColumn(name = "marker_id")
     private Marker marker;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @MapsId("itinerary_id")
+    @JoinColumn(name = "itinerary_id")
+    private Itinerary itinerary;
 
     private Time startTime;
 

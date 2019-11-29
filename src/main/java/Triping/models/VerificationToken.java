@@ -13,7 +13,8 @@ import java.util.Date;
 public class VerificationToken {
     private static final int EXPIRATION = 60 * 24;
 
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @OneToOne(targetEntity = User.class, fetch = FetchType.EAGER)

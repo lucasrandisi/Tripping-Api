@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Set;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 
 import Triping.utils.exceptions.NotImplementedException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -15,10 +16,14 @@ import lombok.Setter;
 @Getter @Setter
 public class Trip {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long tripId;
 
+    @Size(max = 20)
     private String title;
+
+    @Size(max = 500)
     private String description;
     private Date departureDate;
     private Date endDate;

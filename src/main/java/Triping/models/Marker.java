@@ -1,5 +1,6 @@
 package Triping.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -13,8 +14,8 @@ public class Marker {
     /* Point of interest*/
 
     @Id
-    @GeneratedValue(strategy= GenerationType.AUTO)
-    private Long id;
+    @GeneratedValue(strategy= GenerationType.IDENTITY)
+    private Long markerId;
 
     private String description;
     private String address;
@@ -32,4 +33,9 @@ public class Marker {
     @OneToMany(mappedBy = "marker")
     private List<ItineraryMarkers> itineraries;
 
+    //Esta propiedad se usa en caso de que sea un marker personalizado
+    @ManyToOne
+    @JoinColumn(name="owner")
+    @JsonIgnore
+    private User owner;
 }
