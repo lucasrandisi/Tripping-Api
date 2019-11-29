@@ -1,12 +1,15 @@
 package Triping.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.Getter;
+import lombok.Setter;
 import org.hibernate.annotations.NaturalId;
 
 import javax.persistence.*;
 import java.util.*;
 
 @Entity
+@Getter @Setter
 public class User {
     @Id
     @GeneratedValue(strategy=GenerationType.AUTO)
@@ -20,9 +23,8 @@ public class User {
     private Boolean enabled;
     private String email;
     private byte[] userImage;
-    private String nombre;
-    private String apellido;
-
+    private String name;
+    private String surname;
 
     @ManyToMany
     @JoinTable(name = "user_friends",
@@ -67,87 +69,6 @@ public class User {
 
     public User(){
         this.enabled = false;
-    }
-
-
-    public Long getUserId() { return userId; }
-
-    public void setUserId(Long userId) { this.userId = userId; }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Boolean getEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(Boolean enabled) {
-        this.enabled = enabled;
-    }
-
-    public String getNombre() {
-        return nombre;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public String getApellido() {
-        return apellido;
-    }
-
-    public void setApellido(String apellido) {
-        this.apellido = apellido;
-    }
-
-    public byte[] getUserImage() { return userImage; }
-
-    public void setUserImage(byte[] userImage) { this.userImage = userImage; }
-
-    public String getEmail() {return email; }
-
-    public void setEmail(String email) {this.email = email;}
-
-    public boolean isEnabled() { return enabled; }
-
-    public void setEnabled(boolean enabled) { this.enabled = enabled; }
-
-    public List<User> getFriends() { return friends; }
-
-    public void setFriends(List<User> friends) { this.friends = friends; }
-
-    public List<User> getFriendOf() { return friendOf; }
-
-    public void setFriendOf(List<User> friendOf) { this.friendOf = friendOf; }
-
-    public Set<Interest> getUserInterests() { return userInterests; }
-
-    public void setUserInterests(Set<Interest> userInterests) {this.userInterests = userInterests; }
-
-    public List<Trip> getOwnedTrips() { return ownedTrips; }
-
-    public void setOwnedTrips(List<Trip> ownedTrips) { this.ownedTrips = ownedTrips; }
-
-    public Set<TripParty> getTripParties() {
-        return tripParties;
-    }
-
-    public void setTripParties(Set<TripParty> tripParties) {
-        this.tripParties = tripParties;
     }
 
     @Override

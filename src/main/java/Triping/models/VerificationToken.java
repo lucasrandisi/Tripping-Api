@@ -1,11 +1,15 @@
 package Triping.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 
 @Entity
+@Getter @Setter
 public class VerificationToken {
     private static final int EXPIRATION = 60 * 24;
 

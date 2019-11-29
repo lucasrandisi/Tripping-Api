@@ -203,8 +203,8 @@ public class UserService implements IUserService{
         }
 
         UserDto userDto = new UserDto();
-        userDto.setNombre(userToFind.getNombre());
-        userDto.setApellido(userToFind.getApellido());
+        userDto.setNombre(userToFind.getName());
+        userDto.setApellido(userToFind.getSurname());
         userDto.setEmail(userToFind.getEmail());
         userDto.setUserImage(userToFind.getUserImage());
 
@@ -224,8 +224,8 @@ public class UserService implements IUserService{
             UserDto userDto = new UserDto();
 
             userDto.setId(u.getUserId());
-            userDto.setNombre(u.getNombre());
-            userDto.setApellido(u.getApellido());
+            userDto.setNombre(u.getName());
+            userDto.setApellido(u.getSurname());
 
             followedUsers.add(userDto);
         }
@@ -246,8 +246,8 @@ public class UserService implements IUserService{
             UserDto userDto = new UserDto();
 
             userDto.setId(u.getUserId());
-            userDto.setNombre(u.getNombre());
-            userDto.setApellido(u.getApellido());
+            userDto.setNombre(u.getName());
+            userDto.setApellido(u.getSurname());
 
             followers.add(userDto);
         }

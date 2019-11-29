@@ -1,11 +1,15 @@
 package Triping.models;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
 
 @Entity
+@Getter @Setter
 public class InvitationToken {
 
     private static final int EXPIRATION = 60 * 24;
@@ -51,22 +55,6 @@ public class InvitationToken {
     public boolean isExpired() {
         Calendar cal = Calendar.getInstance();
         return (expiryDate.getTime() - cal.getTime().getTime()) <= 0;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public Trip getTrip() {
-        return trip;
-    }
-
-    public void setTrip(Trip trip) {
-        this.trip = trip;
     }
 
     public Date getExpiryDate() {
