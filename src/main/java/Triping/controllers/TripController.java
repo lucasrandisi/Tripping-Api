@@ -21,6 +21,7 @@ import java.net.URI;
 import java.util.*;
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api/v1/trips")
 public class TripController {
 
@@ -110,8 +111,8 @@ public class TripController {
 
     @GetMapping(path="/join")
     public ResponseEntity<?> joinTripViaInvitationLink(@RequestParam String token){
-        InvitationToken invitationToken = tripService.getInvitationToken(token);
 
+        InvitationToken invitationToken = tripService.getInvitationToken(token);
         if (invitationToken == null) {
             return new ResponseEntity<>("Invalid token", HttpStatus.BAD_REQUEST);
         }
