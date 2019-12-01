@@ -37,10 +37,10 @@ public class User implements UserDetails {
     @ManyToMany
     @JoinTable(name = "followers", joinColumns = @JoinColumn(name="user"), inverseJoinColumns=@JoinColumn(name="followed_user"))
     @JsonBackReference
-    private List<User> following;
+    private Set<User> following;
 
     @ManyToMany(mappedBy = "following")
-    private List<User> followers;
+    private Set<User> followers;
 
     @OneToMany(mappedBy = "owner")
     @JsonIgnoreProperties("owner")
@@ -102,13 +102,14 @@ public class User implements UserDetails {
         return following.contains(user);
     }
 
-    public void follow(User user) {
+    public boolean follow(User user) {
         if(!user.equals(this))
-        following.add(user);
+        return following.add(user);
+        else return false;
     }
 
-    public void unFollow(User user) {
-        following.remove(user);
+    public boolean unFollow(User user) {
+        return following.remove(user);
     }
 
     public void removeFollower(User user) {

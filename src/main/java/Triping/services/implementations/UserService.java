@@ -46,7 +46,6 @@ public class UserService implements IUserService {
         userRepository.save(user);
     }
 
-    // ----------------   Find methods    ----------------
     @Override
     public User findUserByEmail(final String email) {
         return userRepository.findByEmail(email);
@@ -57,49 +56,32 @@ public class UserService implements IUserService {
         return userRepository.findByUsername(username);
     }
 
-    // ----------------   Follow    ----------------
     @Override
-    public void followUser(String toFollowUsername) throws ResourceNotFoundException, AlredyAddedException, SameEntityException {
+    public void followUser(String username) throws ResourceNotFoundException, AlredyAddedException {
         final User authenticatedUser = userRepository.findByUsername(accountService.currentAuthenticatedUser());
-        User toFollowUser = findUserByUsername(toFollowUsername);
+        final User user = findUserByUsername(username);
 
-        if (toFollowUser == null) {
+        if (user == null) {
             throw new ResourceNotFoundException("Usuario no encontrado");
         }
-
-        if (authenticatedUser == toFollowUser){
-            throw new SameEntityException("Error al intentar seguir a uno mismo");
-        }
-
-        if(authenticatedUser.getFollowing().contains(toFollowUser)) {
+        if(!authenticatedUser.follow(user)) {
             throw new AlredyAddedException("Ya sigue a este usuario");
         }
-
-        authenticatedUser.getFollowing().add(toFollowUser);
-        userRepository.save(authenticatedUser);
     }
 
     @Override
-    public void unfollowUser(String toUnfollowUsername) throws ResourceNotFoundException, SameEntityException {
+    public void unFollowUser(String username) throws ResourceNotFoundException {
         final User authenticatedUser = userRepository.findByUsername(accountService.currentAuthenticatedUser());
-        User toUnfollowUser = findUserByUsername(toUnfollowUsername);
+        User user = findUserByUsername(username);
 
-        if (toUnfollowUser == null) {
+        if (user == null) {
             throw new ResourceNotFoundException("Usuario no encontrado");
         }
-
-        if (authenticatedUser == toUnfollowUser) {
-            throw new SameEntityException("Error al intentar dejar de seguir a uno mismo");
-        }
-
-        if(!authenticatedUser.getFollowing().contains(toUnfollowUser)) {
+        if(!authenticatedUser.unFollow(user)) {
             throw new ResourceNotFoundException("Error al intentar dejar de seguir un usuario al que no se sigue");
         }
-
-        authenticatedUser.getFollowing().remove(toUnfollowUser);
     }
 
-    // ----------------   Interests   ----------------
     @Override
     public Set<InterestDto> getInterests(){
         Set<InterestDto> userInterests = new LinkedHashSet<>();
@@ -110,7 +92,6 @@ public class UserService implements IUserService {
             Long id = interest.getId();
             userInterests.add( new InterestDto(id, description));
         }
-
         return userInterests;
     }
 
@@ -143,7 +124,6 @@ public class UserService implements IUserService {
         authenticatedUser.getUserInterests().remove(interestToRemove);
     }
 
-    // ----------------   User's Data   ----------------
     @Override
     public UserDto getProfile(String username) throws ResourceNotFoundException {
         User user = findUserByUsername(username);

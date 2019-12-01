@@ -1,8 +1,6 @@
 package Triping.controllers;
 
 import Triping.dto.*;
-import Triping.models.User;
-import Triping.services.specifications.IAccountService;
 import Triping.services.specifications.IUserService;
 import Triping.utils.exceptions.AlredyAddedException;
 import Triping.utils.exceptions.ResourceNotFoundException;
@@ -10,11 +8,8 @@ import Triping.utils.exceptions.SameEntityException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Set;
 
@@ -32,8 +27,8 @@ public class UserController {
     }
 
     @DeleteMapping("user/follow/{username}")
-    public ResponseEntity<String> unfollowUser(@PathVariable String username) throws ResourceNotFoundException, SameEntityException {
-        userService.unfollowUser(username);
+    public ResponseEntity<String> unFollowUser(@PathVariable String username) throws ResourceNotFoundException, SameEntityException {
+        userService.unFollowUser(username);
         return new ResponseEntity<>("Usuario unfollowed", HttpStatus.OK);
     }
 

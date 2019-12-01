@@ -18,7 +18,7 @@ public interface IUserService {
 
     void followUser(String username) throws ResourceNotFoundException, AlredyAddedException, SameEntityException;
 
-    void unfollowUser(String username) throws ResourceNotFoundException, SameEntityException;
+    void unFollowUser(String username) throws ResourceNotFoundException, SameEntityException;
 
     void addInterest(Long id) throws ResourceNotFoundException, AlredyAddedException;
 
