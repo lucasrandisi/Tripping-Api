@@ -25,7 +25,10 @@ public class User {
 
     private String password;
     private Boolean enabled;
-    private byte[] userImage;
+
+    @Lob
+    private byte[] profilePicture;
+
     private String name;
     private String surname;
 
@@ -65,6 +68,23 @@ public class User {
 
     public User(){
         this.enabled = false;
+    }
+
+    public boolean doesFollow(User user) {
+        return following.contains(user);
+    }
+
+    public void follow(User user) {
+        if(!user.equals(this))
+        following.add(user);
+    }
+
+    public void unFollow(User user) {
+        following.remove(user);
+    }
+
+    public void removeFollower(User user) {
+        followers.remove(this);
     }
 
     @Override
