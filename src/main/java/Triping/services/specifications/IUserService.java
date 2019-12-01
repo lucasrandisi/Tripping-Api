@@ -16,15 +16,15 @@ public interface IUserService {
 
     void saveUser(User user);
 
-    void followUser(User currentUser, String username) throws ResourceNotFoundException, AlredyAddedException, SameEntityException;
+    void followUser(String username) throws ResourceNotFoundException, AlredyAddedException, SameEntityException;
 
-    void unfollowUser(User currentUser, String username) throws ResourceNotFoundException, SameEntityException;
+    void unfollowUser(String username) throws ResourceNotFoundException, SameEntityException;
 
-    void addInterest(User currentUser, Long id) throws ResourceNotFoundException, AlredyAddedException;
+    void addInterest(Long id) throws ResourceNotFoundException, AlredyAddedException;
 
-    Set<InterestDto> getInterests(User currentUser);
+    Set<InterestDto> getInterests();
 
-    void removeInterest(User currentUser, Long id) throws ResourceNotFoundException;
+    void removeInterest(Long id) throws ResourceNotFoundException;
 
     UserDto getProfile(String username) throws ResourceNotFoundException;
 

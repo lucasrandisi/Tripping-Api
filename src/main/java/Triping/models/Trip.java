@@ -54,7 +54,7 @@ public class Trip {
         throw new NotImplementedException();
     }
 
-    public Boolean isOwner(User user){
+    public Boolean hasOwner(User user){
         return this.getOwner().equals(user);
     }
 

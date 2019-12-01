@@ -2,6 +2,7 @@ package Triping.controllers;
 
 import Triping.dto.*;
 import Triping.models.User;
+import Triping.services.specifications.IAccountService;
 import Triping.services.specifications.IUserService;
 import Triping.utils.exceptions.AlredyAddedException;
 import Triping.utils.exceptions.ResourceNotFoundException;
@@ -24,54 +25,34 @@ public class UserController {
     @Autowired
     private IUserService userService;
 
-
-    // ------------------ Follow ------------------
-
     @PostMapping("user/follow/{username}")
     public ResponseEntity<String> followUser(@PathVariable String username) throws AlredyAddedException, SameEntityException, ResourceNotFoundException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
-
-        userService.followUser(currentUser, username);
+        userService.followUser(username);
         return new ResponseEntity<>("Usuario seguido", HttpStatus.OK);
     }
 
     @DeleteMapping("user/follow/{username}")
     public ResponseEntity<String> unfollowUser(@PathVariable String username) throws ResourceNotFoundException, SameEntityException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
-
-        userService.unfollowUser(currentUser, username);
+        userService.unfollowUser(username);
         return new ResponseEntity<>("Usuario unfollowed", HttpStatus.OK);
     }
 
-    // ------------------ Interests ------------------
-
     @GetMapping("/user/interests")
     public ResponseEntity<Set<InterestDto>> getInterests() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
-
-        Set<InterestDto> userInterests = userService.getInterests(currentUser);
+        Set<InterestDto> userInterests = userService.getInterests();
         return new ResponseEntity<>(userInterests, HttpStatus.OK);
     }
 
 
     @PostMapping("user/interests/{id}")
     public ResponseEntity<String> addInterest(@PathVariable("id") Long interestId) throws ResourceNotFoundException, AlredyAddedException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
-
-        userService.addInterest(currentUser, interestId);
+        userService.addInterest(interestId);
         return new ResponseEntity<>("Interes agregado", HttpStatus.OK);
     }
 
     @DeleteMapping("user/interests/{id}")
     public ResponseEntity<String> removeInterest(@PathVariable("id") Long interestId) throws ResourceNotFoundException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User currentUser = userService.findUserByUsername(auth.getPrincipal().toString());
-
-        userService.removeInterest(currentUser, interestId);
+        userService.removeInterest(interestId);
         return new ResponseEntity<>("Interés removido", HttpStatus.OK);
     }
 

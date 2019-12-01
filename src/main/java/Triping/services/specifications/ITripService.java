@@ -5,19 +5,20 @@ import Triping.models.Trip;
 import Triping.models.User;
 import Triping.utils.exceptions.ResourceNotFoundException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
 
 public interface ITripService {
     
     List<Trip> findAll();
 
-    Trip getOne(Long id, User authenticatedUser) throws ResourceNotFoundException;
+    Trip getOne(Long id) throws ResourceNotFoundException;
 
-    Trip createNewTrip(Trip trip, User authenticatedUser);
+    Trip createNewTrip(Trip trip);
 
-    Trip updateTrip(Long id, Trip tripDetails, User authenticatedUser) throws ResourceNotFoundException;
+    Trip updateTrip(Long id, Trip tripDetails)  throws ResourceNotFoundException;
 
-    void deleteTrip(Long id, User authenticatedUser) throws ResourceNotFoundException;
+    void deleteTrip(Long id)  throws ResourceNotFoundException;
 
     void addContributorToTrip(Trip trip, User contributor);
 

@@ -9,6 +9,7 @@ import Triping.repositories.InterestRepository;
 import Triping.repositories.TripRepository;
 import Triping.repositories.UserRepository;
 import Triping.repositories.VerificationTokenRepository;
+import Triping.services.specifications.IAccountService;
 import Triping.services.specifications.IUserService;
 import Triping.tasks.OnRegistrationCompleteEvent;
 import Triping.utils.exceptions.*;
@@ -37,16 +38,13 @@ public class UserService implements IUserService {
     @Autowired
     private TripRepository tripRepository;
 
-
-
-    // ----------------   Save    ----------------
+    @Autowired
+    private IAccountService accountService;
 
     @Override
     public void saveUser(User user) {
         userRepository.save(user);
     }
-
-
 
     // ----------------   Find methods    ----------------
     @Override
@@ -59,57 +57,55 @@ public class UserService implements IUserService {
         return userRepository.findByUsername(username);
     }
 
-
-
     // ----------------   Follow    ----------------
-
     @Override
-    public void followUser(User currentUser, String toFollowUsername) throws ResourceNotFoundException, AlredyAddedException, SameEntityException {
+    public void followUser(String toFollowUsername) throws ResourceNotFoundException, AlredyAddedException, SameEntityException {
+        final User authenticatedUser = userRepository.findByUsername(accountService.currentAuthenticatedUser());
         User toFollowUser = findUserByUsername(toFollowUsername);
 
         if (toFollowUser == null) {
             throw new ResourceNotFoundException("Usuario no encontrado");
         }
 
-        if (currentUser == toFollowUser){
+        if (authenticatedUser == toFollowUser){
             throw new SameEntityException("Error al intentar seguir a uno mismo");
         }
 
-        if(currentUser.getFollowing().contains(toFollowUser)) {
+        if(authenticatedUser.getFollowing().contains(toFollowUser)) {
             throw new AlredyAddedException("Ya sigue a este usuario");
         }
 
-        currentUser.getFollowing().add(toFollowUser);
-        userRepository.save(currentUser);
-
+        authenticatedUser.getFollowing().add(toFollowUser);
+        userRepository.save(authenticatedUser);
     }
 
     @Override
-    public void unfollowUser(User currentUser, String toUnfollowUsername) throws ResourceNotFoundException, SameEntityException {
+    public void unfollowUser(String toUnfollowUsername) throws ResourceNotFoundException, SameEntityException {
+        final User authenticatedUser = userRepository.findByUsername(accountService.currentAuthenticatedUser());
         User toUnfollowUser = findUserByUsername(toUnfollowUsername);
 
         if (toUnfollowUser == null) {
             throw new ResourceNotFoundException("Usuario no encontrado");
         }
 
-        if (currentUser == toUnfollowUser) {
+        if (authenticatedUser == toUnfollowUser) {
             throw new SameEntityException("Error al intentar dejar de seguir a uno mismo");
         }
 
-        if(!currentUser.getFollowing().contains(toUnfollowUser)) {
+        if(!authenticatedUser.getFollowing().contains(toUnfollowUser)) {
             throw new ResourceNotFoundException("Error al intentar dejar de seguir un usuario al que no se sigue");
         }
 
-        currentUser.getFollowing().remove(toUnfollowUser);
+        authenticatedUser.getFollowing().remove(toUnfollowUser);
     }
 
     // ----------------   Interests   ----------------
-
     @Override
-    public Set<InterestDto> getInterests(User currentUser){
+    public Set<InterestDto> getInterests(){
         Set<InterestDto> userInterests = new LinkedHashSet<>();
+        final User authenticatedUser = userRepository.findByUsername(accountService.currentAuthenticatedUser());
 
-        for(Interest interest : currentUser.getUserInterests()){
+        for(Interest interest : authenticatedUser.getUserInterests()){
             String description = interest.getDescription();
             Long id = interest.getId();
             userInterests.add( new InterestDto(id, description));
@@ -119,30 +115,32 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void addInterest(User currentUser,Long id) throws ResourceNotFoundException, AlredyAddedException {
+    public void addInterest(Long id) throws ResourceNotFoundException, AlredyAddedException {
         Optional<Interest> interestSearch = interestRepository.findById(id);
+        final User authenticatedUser = userRepository.findByUsername(accountService.currentAuthenticatedUser());
 
         Interest interestToAdd = interestSearch.orElseThrow(() -> new ResourceNotFoundException("Interés no encontrado"));
 
-        if(currentUser.getUserInterests().contains(interestToAdd)){
+        if(authenticatedUser.getUserInterests().contains(interestToAdd)){
             throw new AlredyAddedException("El interés ya se encuentra agregado al usuario");
         }
 
-        currentUser.getUserInterests().add(interestToAdd);
+        authenticatedUser.getUserInterests().add(interestToAdd);
 
-        userRepository.save(currentUser);
+        userRepository.save(authenticatedUser);
     }
 
-    public void removeInterest(User currentUser, Long id) throws ResourceNotFoundException {
+    public void removeInterest(Long id) throws ResourceNotFoundException {
         Optional<Interest> interestSearch = interestRepository.findById(id);
+        final User authenticatedUser = userRepository.findByUsername(accountService.currentAuthenticatedUser());
 
         Interest interestToRemove = interestSearch.orElseThrow(() -> new ResourceNotFoundException("Interés no encontrado"));
 
-        if(!currentUser.getUserInterests().contains((interestToRemove))){
+        if(!authenticatedUser.getUserInterests().contains((interestToRemove))){
             throw new ResourceNotFoundException("El interés no pertenece al usuario");
         }
 
-        currentUser.getUserInterests().remove(interestToRemove);
+        authenticatedUser.getUserInterests().remove(interestToRemove);
     }
 
     // ----------------   User's Data   ----------------
@@ -225,13 +223,10 @@ public class UserService implements IUserService {
 
         Trip trip = optionalTrip.orElseThrow(() -> new ResourceNotFoundException("Viaje no encontrado"));
 
-        if (trip.getOwner() != userToFind) {
+        if (!trip.hasOwner(userToFind)) {
             throw new ResourceNotFoundException("El viaje no pertenece al usuario");
         }
 
         return new TripDto(trip);
     }
-
-
-
 }
