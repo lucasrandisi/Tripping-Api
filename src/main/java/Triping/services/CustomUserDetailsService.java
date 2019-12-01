@@ -1,31 +1,31 @@
 package Triping.services;
 
-import Triping.models.CustomUserDetails;
 import Triping.models.User;
 import Triping.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
+import java.util.logging.Logger;
 
 @Service("userDetailsService")
 public class CustomUserDetailsService implements UserDetailsService {
+
+    private static final Logger logger = Logger.getLogger(CustomUserDetailsService.class.getName());
+
     @Autowired
     private UserRepository userRepository;
 
     @Override
-    public CustomUserDetails loadUserByUsername(String usernameToSearch) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(usernameToSearch);
+    public User loadUserByUsername(String username) throws UsernameNotFoundException {
+        logger.info("Authenticating request: "+ username);
+        // TODO: 22.02.2017 Provide authentication both by login and 2fa
 
-        CustomUserDetails customUserDetails = new CustomUserDetails(user);
-
-        return  customUserDetails;
+        final User user = userRepository.findByUsername(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("Profile is not found:" + username);
+        }
+        return user;
     }
 }
