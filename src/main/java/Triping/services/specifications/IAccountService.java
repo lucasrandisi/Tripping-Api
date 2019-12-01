@@ -26,4 +26,6 @@ public interface IAccountService {
     void changeEmail(User currentUser, EmailDto emailDto) throws SameEntityException;
 
     boolean validateUsernameAndPassword(String username, String password) throws ResourceNotFoundException;
+
+    String currentAuthenticatedUser();
 }

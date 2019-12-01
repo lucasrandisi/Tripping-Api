@@ -39,6 +39,15 @@ public class AccountController {
     @Autowired
     IAccountService accountService;
 
+    @GetMapping(path="/me")
+    public ResponseEntity<?> getCurrentAuthenticatedUser(){
+        String username = accountService.currentAuthenticatedUser();
+
+        URI location = ServletUriComponentsBuilder.fromCurrentContextPath()
+                .path("user/{username}").buildAndExpand(username).toUri();
+        return ResponseEntity.ok(location);
+    }
+
     /**
      *Registration of new account
      * @param accountDto

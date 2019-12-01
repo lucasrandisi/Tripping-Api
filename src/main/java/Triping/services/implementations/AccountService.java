@@ -13,6 +13,10 @@ import Triping.tasks.OnRegistrationCompleteEvent;
 import Triping.utils.exceptions.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -132,5 +136,21 @@ public class AccountService implements IAccountService {
 
         currentUser.setEmail(emailDto.getEmail());
         userRepository.save(currentUser);
+    }
+
+    @Override
+    public String currentAuthenticatedUser() {
+        final SecurityContext securityContext = SecurityContextHolder.getContext();
+        final Authentication authentication = securityContext.getAuthentication();
+        String auth = null;
+        if (authentication != null) {
+            if (authentication.getPrincipal() instanceof UserDetails) {
+                final UserDetails springSecurityUser = (UserDetails) authentication.getPrincipal();
+                auth = springSecurityUser.getUsername();
+            } else if (authentication.getPrincipal() instanceof String) {
+                auth = (String) authentication.getPrincipal();
+            }
+        }
+        return auth;
     }
 }
