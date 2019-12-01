@@ -1,6 +1,7 @@
 package Triping.controllers;
 
 import Triping.dto.*;
+import Triping.models.Interest;
 import Triping.services.specifications.IUserService;
 import Triping.utils.exceptions.AlredyAddedException;
 import Triping.utils.exceptions.ResourceNotFoundException;
@@ -33,8 +34,8 @@ public class UserController {
     }
 
     @GetMapping("/user/interests")
-    public ResponseEntity<Set<InterestDto>> getInterests() {
-        Set<InterestDto> userInterests = userService.getInterests();
+    public ResponseEntity<Set<Interest>> getInterests() {
+        Set<Interest> userInterests = userService.getInterests();
         return new ResponseEntity<>(userInterests, HttpStatus.OK);
     }
 

@@ -1,6 +1,7 @@
 package Triping.services.specifications;
 
 import Triping.dto.*;
+import Triping.models.Interest;
 import Triping.models.User;
 import Triping.models.VerificationToken;
 import Triping.utils.exceptions.*;
@@ -22,7 +23,7 @@ public interface IUserService {
 
     void addInterest(Long id) throws ResourceNotFoundException, AlredyAddedException;
 
-    Set<InterestDto> getInterests();
+    Set<Interest> getInterests();
 
     void removeInterest(Long id) throws ResourceNotFoundException;
 

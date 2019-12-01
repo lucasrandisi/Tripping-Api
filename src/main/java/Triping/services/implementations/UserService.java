@@ -83,45 +83,34 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Set<InterestDto> getInterests(){
-        Set<InterestDto> userInterests = new LinkedHashSet<>();
+    public Set<Interest> getInterests(){
         final User authenticatedUser = userRepository.findByUsername(accountService.currentAuthenticatedUser());
-
-        for(Interest interest : authenticatedUser.getUserInterests()){
-            String description = interest.getDescription();
-            Long id = interest.getId();
-            userInterests.add( new InterestDto(id, description));
-        }
-        return userInterests;
+        return authenticatedUser.getUserInterests();
     }
 
     @Override
     public void addInterest(Long id) throws ResourceNotFoundException, AlredyAddedException {
-        Optional<Interest> interestSearch = interestRepository.findById(id);
         final User authenticatedUser = userRepository.findByUsername(accountService.currentAuthenticatedUser());
 
-        Interest interestToAdd = interestSearch.orElseThrow(() -> new ResourceNotFoundException("Interés no encontrado"));
+        Interest interest = interestRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Interés no encontrado")
+        );
 
-        if(authenticatedUser.getUserInterests().contains(interestToAdd)){
+        if(!authenticatedUser.addInterest(interest)){
             throw new AlredyAddedException("El interés ya se encuentra agregado al usuario");
         }
-
-        authenticatedUser.getUserInterests().add(interestToAdd);
-
-        userRepository.save(authenticatedUser);
     }
 
     public void removeInterest(Long id) throws ResourceNotFoundException {
-        Optional<Interest> interestSearch = interestRepository.findById(id);
         final User authenticatedUser = userRepository.findByUsername(accountService.currentAuthenticatedUser());
 
-        Interest interestToRemove = interestSearch.orElseThrow(() -> new ResourceNotFoundException("Interés no encontrado"));
+        Interest interest = interestRepository.findById(id).orElseThrow(
+                () -> new ResourceNotFoundException("Interés no encontrado")
+        );
 
-        if(!authenticatedUser.getUserInterests().contains((interestToRemove))){
+        if(!authenticatedUser.removeInterest(interest)){
             throw new ResourceNotFoundException("El interés no pertenece al usuario");
         }
-
-        authenticatedUser.getUserInterests().remove(interestToRemove);
     }
 
     @Override

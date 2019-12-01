@@ -1,5 +1,6 @@
 package Triping.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,9 +18,11 @@ public class Interest {
     private String description;
 
     @ManyToMany(mappedBy = "userInterests")
+    @JsonIgnore
     private Set<User> users;
 
     @ManyToMany(mappedBy = "markerInterests")
+    @JsonIgnore
     private Set<Marker> markers;
 
 }

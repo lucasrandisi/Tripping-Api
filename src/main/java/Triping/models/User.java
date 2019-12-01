@@ -116,6 +116,14 @@ public class User implements UserDetails {
         followers.remove(this);
     }
 
+    public boolean addInterest(Interest interest) {
+        return userInterests.add(interest);
+    }
+
+    public boolean removeInterest(Interest interest) {
+        return userInterests.remove(interest);
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
