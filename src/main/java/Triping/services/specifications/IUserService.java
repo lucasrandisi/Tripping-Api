@@ -3,8 +3,9 @@ package Triping.services.specifications;
 import Triping.dto.*;
 import Triping.models.Interest;
 import Triping.models.User;
-import Triping.models.VerificationToken;
 import Triping.utils.exceptions.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Set;
@@ -29,9 +30,9 @@ public interface IUserService {
 
     UserDto getProfile(String username) throws ResourceNotFoundException;
 
-    List<UserDto> getFollowed(String username) throws ResourceNotFoundException;
+    Page<User> findFollowedUsers(String username, String searchTerm, Pageable pageRequest);
 
-    List<UserDto> getFollowers(String username) throws ResourceNotFoundException;
+    Page<User> findUserFollowers(String username, String searchTerm, Pageable pageRequest);
 
     List<TripDto> getTrips(String username, String title) throws ResourceNotFoundException;
 

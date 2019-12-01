@@ -4,24 +4,18 @@ import Triping.dto.*;
 import Triping.models.Interest;
 import Triping.models.Trip;
 import Triping.models.User;
-import Triping.models.VerificationToken;
 import Triping.repositories.InterestRepository;
 import Triping.repositories.TripRepository;
 import Triping.repositories.UserRepository;
-import Triping.repositories.VerificationTokenRepository;
 import Triping.services.specifications.IAccountService;
 import Triping.services.specifications.IUserService;
-import Triping.tasks.OnRegistrationCompleteEvent;
 import Triping.utils.exceptions.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.context.event.ApplicationEventMulticaster;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.*;
 
@@ -124,35 +118,13 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public List<UserDto> getFollowed(String username) throws ResourceNotFoundException {
-        User userToFind = findUserByUsername(username);
-
-        if (userToFind == null) {
-            throw new ResourceNotFoundException("Usuario no encontrado");
-        }
-
-        List<UserDto> followedUsers = new ArrayList<>();
-        for(User user : userToFind.getFollowing()){
-            UserDto userDto = new UserDto(user);
-            followedUsers.add(userDto);
-        }
-        return followedUsers;
+    public Page<User> findFollowedUsers(String username, String searchTerm, Pageable pageRequest) {
+        return userRepository.findFollowedUsers(username, searchTerm, pageRequest);
     }
 
     @Override
-    public List<UserDto> getFollowers(String username) throws ResourceNotFoundException {
-        User userToFind = findUserByUsername(username);
-
-        if (userToFind == null) {
-            throw new ResourceNotFoundException("Usuario no encontrado");
-        }
-
-        List<UserDto> followers = new ArrayList<>();
-        for(User user : userToFind.getFollowers()){
-            UserDto userDto = new UserDto(user);
-            followers.add(userDto);
-        }
-        return followers;
+    public Page<User> findUserFollowers(String username, String searchTerm, Pageable pageRequest) {
+        return userRepository.findUserFollowers(username, searchTerm, pageRequest);
     }
 
     @Override

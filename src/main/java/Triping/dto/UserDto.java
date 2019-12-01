@@ -16,7 +16,7 @@ public class UserDto {
 
     public UserDto(User user){
         this.setId(user.getUserId());
-        this.setUsername(user.getSurname());
+        this.setUsername(user.getUsername());
         this.setEmail(user.getEmail());
         this.setProfilePicture(user.getProfilePicture());
 

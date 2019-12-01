@@ -2,11 +2,15 @@ package Triping.controllers;
 
 import Triping.dto.*;
 import Triping.models.Interest;
+import Triping.models.User;
 import Triping.services.specifications.IUserService;
 import Triping.utils.exceptions.AlredyAddedException;
 import Triping.utils.exceptions.ResourceNotFoundException;
 import Triping.utils.exceptions.SameEntityException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,16 +62,31 @@ public class UserController {
         return new ResponseEntity<>(userProfile, HttpStatus.OK);
     }
 
+    /**
+     * Endpoint with pageable and sortable payload for getting user's followed users
+     * Example URI: /user1/followed?search=pete&page=2&size=5&order=username,asc
+     * @param username of the user to search
+     * @param searchTerm optional partial description that filters usernames of followed users
+     * @param pageRequest
+     */
     @GetMapping("/{username}/followed")
-    public ResponseEntity<List<UserDto>> followed(@PathVariable String username) throws  ResourceNotFoundException {
-        List<UserDto> userFriends = userService.getFollowed(username);
-        return new ResponseEntity<>(userFriends, HttpStatus.OK);
+    public Page<UserDto> findFollowedUsers(
+            @PathVariable String username,
+            @RequestParam(name = "search", defaultValue = "", required = false) String searchTerm,
+            @PageableDefault(size = 20) Pageable pageRequest){
+
+        final Page<User> userFriends = userService.findFollowedUsers(username, searchTerm, pageRequest);
+        return userFriends.map(UserDto::new);
     }
 
     @GetMapping("/{username}/followers")
-    public ResponseEntity<List<UserDto>> followers(@PathVariable String username) throws  ResourceNotFoundException {
-        List<UserDto> userFriends = userService.getFollowers(username);
-        return new ResponseEntity<>(userFriends, HttpStatus.OK);
+    public Page<UserDto> findUserFollowers(
+            @PathVariable String username,
+            @RequestParam(name = "search", defaultValue = "", required = false) String searchTerm,
+            @PageableDefault(size = 20) Pageable pageRequest){
+
+        final Page<User> userFriends = userService.findUserFollowers(username, searchTerm, pageRequest);
+        return userFriends.map(UserDto::new);
     }
 
     @GetMapping("/{username}/trips/{id}")
