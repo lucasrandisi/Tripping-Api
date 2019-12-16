@@ -23,7 +23,6 @@ import java.net.URI;
 import java.util.*;
 
 @RestController
-@CrossOrigin
 @RequestMapping("/api/v1/trips")
 public class TripController {
 

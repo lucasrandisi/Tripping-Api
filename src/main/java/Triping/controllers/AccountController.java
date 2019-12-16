@@ -26,7 +26,6 @@ import javax.validation.Valid;
 import java.net.URI;
 
 @RestController
-@CrossOrigin
 @RequestMapping
 public class AccountController {
 

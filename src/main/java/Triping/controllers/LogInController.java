@@ -19,7 +19,6 @@ import javax.validation.Valid;
 
 
 @RestController
-@CrossOrigin
 @RequestMapping(path="/auth")
 public class LogInController {
     @Autowired
