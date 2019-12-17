@@ -23,7 +23,7 @@ import java.net.URI;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/v1/trips")
+@RequestMapping("/trips")
 public class TripController {
 
     @Autowired
@@ -55,7 +55,7 @@ public class TripController {
         return ResponseEntity.ok().body(updatedTrip);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     public Map<String, Boolean> deleteTrip(@PathVariable Long id) throws ResourceNotFoundException {
         tripService.deleteTrip(id);
         Map<String, Boolean> response = new HashMap<>();
