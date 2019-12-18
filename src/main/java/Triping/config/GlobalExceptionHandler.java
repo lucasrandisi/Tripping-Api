@@ -3,10 +3,7 @@ package Triping.config;
 import java.util.Date;
 
 import Triping.utils.ErrorDetails;
-import Triping.utils.exceptions.AlredyAddedException;
-import Triping.utils.exceptions.BadRequestException;
-import Triping.utils.exceptions.ResourceNotFoundException;
-import Triping.utils.exceptions.SameEntityException;
+import Triping.utils.exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +23,14 @@ public class GlobalExceptionHandler {
         ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
         return new ResponseEntity<>(errorDetails, HttpStatus.NOT_FOUND);
     }
+
+
+    @ExceptionHandler(BusinessLogicException.class)
+    public ResponseEntity<?> businessLogicException(BusinessLogicException ex, WebRequest request) {
+        ErrorDetails errorDetails = new ErrorDetails(new Date(), ex.getMessage(), request.getDescription(false));
+        return new ResponseEntity<>(errorDetails, HttpStatus.CONFLICT);
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> globalExceptionHandler(Exception ex, WebRequest request) {
