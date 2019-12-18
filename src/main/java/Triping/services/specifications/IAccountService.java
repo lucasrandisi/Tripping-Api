@@ -11,7 +11,7 @@ import Triping.utils.exceptions.SameEntityException;
 import Triping.utils.exceptions.UserAlreadyExistsException;
 
 public interface IAccountService {
-    User registerNewUserAccount(AccountDto accountDto) throws UserAlreadyExistsException, ResourceNotFoundException;
+    User registerNewUserAccount(AccountDto accountDto) throws UserAlreadyExistsException;
 
     boolean validatePassword(User user, String password);
 

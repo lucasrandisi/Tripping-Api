@@ -9,9 +9,7 @@ import Triping.services.specifications.IAccountService;
 import Triping.services.specifications.IUserService;
 import Triping.tasks.OnRegistrationCompleteEvent;
 import Triping.utils.GenericResponse;
-import Triping.utils.exceptions.AlredyEnabledException;
-import Triping.utils.exceptions.NotImplementedException;
-import Triping.utils.exceptions.SameEntityException;
+import Triping.utils.exceptions.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
@@ -53,21 +51,17 @@ public class AccountController {
      * @return The URL of created user
      */
     @PostMapping(path="/register")
-    public ResponseEntity<?> registerUserAccount(@Valid @RequestBody AccountDto accountDto) {
-        try {
-            final User registered = accountService.registerNewUserAccount(accountDto);
+    public ResponseEntity<?> registerUserAccount(@Valid @RequestBody AccountDto accountDto) throws UserAlreadyExistsException {
+        final User registered = accountService.registerNewUserAccount(accountDto);
 
-            // Create confirmation token and send confirmation email
-            String appUrl = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
-            eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered, appUrl));
+        // Create confirmation token and send confirmation email
+        String appUrl = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString();
+        eventPublisher.publishEvent(new OnRegistrationCompleteEvent(registered, appUrl));
 
-            URI location = ServletUriComponentsBuilder.fromPath("user/{username}")
-                    .buildAndExpand(registered.getUsername()).toUri();
+        URI location = ServletUriComponentsBuilder.fromPath("user/{username}")
+            .buildAndExpand(registered.getUsername()).toUri();
 
-            return ResponseEntity.created(location).build();
-        } catch (Exception e){
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
-        }
+        return ResponseEntity.created(location).build();
     }
 
     /**

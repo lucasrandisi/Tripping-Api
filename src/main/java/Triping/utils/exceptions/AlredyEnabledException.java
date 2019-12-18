@@ -1,6 +1,6 @@
 package Triping.utils.exceptions;
 
-public class AlredyEnabledException extends BadRequestException {
+public class AlredyEnabledException extends BusinessLogicException {
 
     public AlredyEnabledException(String message) {
         super(message);

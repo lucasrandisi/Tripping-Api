@@ -39,7 +39,7 @@ public class AccountService implements IAccountService {
     private ApplicationEventPublisher applicationEventPublisher;
 
     @Override
-    public User registerNewUserAccount(final AccountDto accountDto) {
+    public User registerNewUserAccount(final AccountDto accountDto) throws UserAlreadyExistsException {
         if (userService.findUserByEmail(accountDto.getEmail()) != null) {
             throw new UserAlreadyExistsException("Ya existe una cuenta registrada con " + accountDto.getEmail());
         }

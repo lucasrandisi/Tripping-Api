@@ -44,9 +44,9 @@ public class TripController {
     }
 
     @PostMapping
-    public Trip createNewTrip(@Valid @RequestBody Trip trip){
+    public ResponseEntity<String> createNewTrip(@Valid @RequestBody Trip trip){
         final Trip created = tripService.createNewTrip(trip);
-        return created;
+        return new ResponseEntity<>("Viaje creado", HttpStatus.OK);
     }
 
     @PutMapping("/{id}")

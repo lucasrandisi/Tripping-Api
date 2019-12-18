@@ -1,11 +1,6 @@
 package Triping.utils.exceptions;
 
-public class UserAlreadyExistsException extends RuntimeException {
-
-    public UserAlreadyExistsException() {
-        super();
-    }
-
+public class UserAlreadyExistsException extends BusinessLogicException {
     public UserAlreadyExistsException(final String message, final Throwable cause) {
         super(message, cause);
     }
@@ -14,7 +9,4 @@ public class UserAlreadyExistsException extends RuntimeException {
         super(message);
     }
 
-    public UserAlreadyExistsException(final Throwable cause) {
-        super(cause);
-    }
 }
