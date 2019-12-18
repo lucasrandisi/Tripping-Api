@@ -9,11 +9,13 @@ import javax.validation.constraints.Size;
 
 import Triping.utils.exceptions.NotImplementedException;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Getter @Setter
+@JsonIgnoreProperties({"hibernateLazyInitializer","handler"})
 public class Trip {
 
     @Id
