@@ -74,8 +74,7 @@ public class UserController {
             @RequestParam(name = "search", defaultValue = "", required = false) String searchTerm,
             @PageableDefault(size = 20) Pageable pageRequest){
 
-        final Page<User> userFriends = userService.findFollowedUsers(username, searchTerm, pageRequest);
-        return userFriends.map(UserDto::new);
+        return userService.findFollowedUsers(username, searchTerm, pageRequest);
     }
 
     @GetMapping("/{username}/followers")
@@ -84,8 +83,7 @@ public class UserController {
             @RequestParam(name = "search", defaultValue = "", required = false) String searchTerm,
             @PageableDefault(size = 20) Pageable pageRequest){
 
-        final Page<User> userFriends = userService.findUserFollowers(username, searchTerm, pageRequest);
-        return userFriends.map(UserDto::new);
+        return userService.findUserFollowers(username, searchTerm, pageRequest);
     }
 
     @GetMapping("/{username}/trips/{id}")

@@ -30,9 +30,9 @@ public interface IUserService {
 
     UserDto getProfile(String username) throws ResourceNotFoundException;
 
-    Page<User> findFollowedUsers(String username, String searchTerm, Pageable pageRequest);
+    Page<UserDto> findFollowedUsers(String username, String searchTerm, Pageable pageRequest);
 
-    Page<User> findUserFollowers(String username, String searchTerm, Pageable pageRequest);
+    Page<UserDto> findUserFollowers(String username, String searchTerm, Pageable pageRequest);
 
     List<TripDto> getTrips(String username, String title) throws ResourceNotFoundException;
 

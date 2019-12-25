@@ -118,13 +118,17 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public Page<User> findFollowedUsers(String username, String searchTerm, Pageable pageRequest) {
-        return userRepository.findFollowedUsers(username, searchTerm, pageRequest);
+    public Page<UserDto> findFollowedUsers(String username, String searchTerm, Pageable pageRequest) {
+        final Page<User> following = userRepository.findFollowedUsers(username, searchTerm, pageRequest);
+        final User authenticatedUser = userRepository.findByUsername(accountService.currentAuthenticatedUser());
+        return following.map(p -> new UserDto(p, authenticatedUser));
     }
 
     @Override
-    public Page<User> findUserFollowers(String username, String searchTerm, Pageable pageRequest) {
-        return userRepository.findUserFollowers(username, searchTerm, pageRequest);
+    public Page<UserDto> findUserFollowers(String username, String searchTerm, Pageable pageRequest) {
+        final Page<User> followers = userRepository.findUserFollowers(username, searchTerm, pageRequest);
+        final User authenticatedUser = userRepository.findByUsername(accountService.currentAuthenticatedUser());
+        return followers.map(p -> new UserDto(p, authenticatedUser));
     }
 
     @Override
