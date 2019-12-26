@@ -51,28 +51,15 @@ public class UserService implements IUserService {
     }
 
     @Override
-    public void followUser(String username) throws ResourceNotFoundException, AlredyAddedException {
-        final User authenticatedUser = userRepository.findByUsername(accountService.currentAuthenticatedUser());
+    public void followUser(String username) throws ResourceNotFoundException {
         final User user = findUserByUsername(username);
+        if (user == null) { throw new ResourceNotFoundException("Usuario no encontrado"); }
 
-        if (user == null) {
-            throw new ResourceNotFoundException("Usuario no encontrado");
-        }
-        if(!authenticatedUser.follow(user)) {
-            throw new AlredyAddedException("Ya sigue a este usuario");
-        }
-    }
-
-    @Override
-    public void unFollowUser(String username) throws ResourceNotFoundException {
         final User authenticatedUser = userRepository.findByUsername(accountService.currentAuthenticatedUser());
-        User user = findUserByUsername(username);
-
-        if (user == null) {
-            throw new ResourceNotFoundException("Usuario no encontrado");
-        }
-        if(!authenticatedUser.unFollow(user)) {
-            throw new ResourceNotFoundException("Error al intentar dejar de seguir un usuario al que no se sigue");
+        if (authenticatedUser.doesFollow(user)) {
+            authenticatedUser.unFollow(user);
+        } else {
+            authenticatedUser.follow(user);
         }
     }
 

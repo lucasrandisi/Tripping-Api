@@ -24,16 +24,16 @@ public class UserController {
     @Autowired
     private IUserService userService;
 
-    @PostMapping("user/follow/{username}")
-    public ResponseEntity<String> followUser(@PathVariable String username) throws AlredyAddedException, SameEntityException, ResourceNotFoundException {
+    /***
+     * This endpoint is idempotent, meaning that it can either create or delete
+     * a following relation between 2 users
+     * @param username of the user to (un)follow
+     * @throws ResourceNotFoundException when the user to (un)follow does not exist
+     */
+    @PutMapping("user/follow/{username}")
+    @ResponseStatus(HttpStatus.OK)
+    public void followUser(@PathVariable String username) throws ResourceNotFoundException {
         userService.followUser(username);
-        return new ResponseEntity<>("Usuario seguido", HttpStatus.OK);
-    }
-
-    @DeleteMapping("user/follow/{username}")
-    public ResponseEntity<String> unFollowUser(@PathVariable String username) throws ResourceNotFoundException, SameEntityException {
-        userService.unFollowUser(username);
-        return new ResponseEntity<>("Usuario unfollowed", HttpStatus.OK);
     }
 
     @GetMapping("/user/interests")
