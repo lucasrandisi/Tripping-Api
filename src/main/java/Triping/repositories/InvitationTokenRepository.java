@@ -1,7 +1,6 @@
 package Triping.repositories;
 
-import Triping.models.Trip;
-import Triping.models.User;
+import Triping.models.Group;
 import Triping.models.InvitationToken;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -14,7 +13,7 @@ public interface InvitationTokenRepository extends JpaRepository<InvitationToken
 
     InvitationToken findByToken(String token);
 
-    InvitationToken findByTrip(Trip trip);
+    InvitationToken findByGroup(Group group);
 
     Stream<InvitationToken> findAllByExpiryDateLessThan(Date now);
 

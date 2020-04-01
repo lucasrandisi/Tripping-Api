@@ -1,10 +1,9 @@
 package Triping.controllers;
 
 import Triping.models.InvitationToken;
-import Triping.models.Trip;
+import Triping.models.Group;
 import Triping.models.User;
-import Triping.services.implementations.AccountService;
-import Triping.services.specifications.ITripService;
+import Triping.services.specifications.IGroupService;
 import Triping.services.specifications.IUserService;
 import Triping.utils.exceptions.AccessDeniedException;
 
@@ -17,60 +16,73 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.persistence.EntityNotFoundException;
 import javax.validation.Valid;
 import java.net.URI;
 import java.util.*;
 
 @RestController
-@RequestMapping("/trips")
-public class TripController {
+@RequestMapping("/groups")
+public class GroupController {
 
     @Autowired
-    private ITripService tripService;
+    private IGroupService groupService;
 
     @Autowired
     private IUserService userService;
 
     @GetMapping
-    public List<Trip> getAllTrips() {
-        return tripService.findAll();
+    public List<Group> getAllGroups() {
+        return groupService.findAll();
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Trip> getOne(@PathVariable(value = "id") Long id)  throws ResourceNotFoundException {
-        Trip trip = tripService.getOne(id);
-        return ResponseEntity.ok().body(trip);
+    public ResponseEntity<Group> getOne(@PathVariable(value = "id") Long id)  throws ResourceNotFoundException {
+        Group group = groupService.getOne(id);
+        return ResponseEntity.ok().body(group);
     }
 
     @PostMapping
-    public ResponseEntity<String> createNewTrip(@Valid @RequestBody Trip trip){
-        final Trip created = tripService.createNewTrip(trip);
-        return new ResponseEntity<>("Viaje creado", HttpStatus.OK);
+    public ResponseEntity<Group> createNewTrip(@Valid @RequestBody Group group){
+        final Group created = groupService.createNewGroup(group);
+        return ResponseEntity.ok().body(group);
     }
 
+    /**
+     * Edit the basic information of a group. Requires admin privileges.
+     * @param id group to edit
+     * @param groupDetails new set of data
+     * @return group information
+     * @throws ResourceNotFoundException
+     */
     @PutMapping("/{id}")
-    public ResponseEntity<Trip> updateTrip(@PathVariable(value = "id") Long id, @Valid @RequestBody Trip tripDetails) throws ResourceNotFoundException {
-        final Trip updatedTrip = tripService.updateTrip(id, tripDetails);
-        return ResponseEntity.ok().body(updatedTrip);
+    public ResponseEntity<Group> updateTrip(@PathVariable(value = "id") Long id, @Valid @RequestBody Group groupDetails) throws ResourceNotFoundException {
+        final Group updatedGroup = groupService.updateTrip(id, groupDetails);
+        return ResponseEntity.ok().body(updatedGroup);
     }
 
     @DeleteMapping("/{id}")
     public Map<String, Boolean> deleteTrip(@PathVariable Long id) throws ResourceNotFoundException {
-        tripService.deleteTrip(id);
+        groupService.deleteTrip(id);
         Map<String, Boolean> response = new HashMap<>();
         response.put("deleted", Boolean.TRUE);
         return response;
     }
 
-    @PutMapping("/{id}/party/{username}")
-    public ResponseEntity<?> addContributor(@PathVariable Long id, @PathVariable String username) throws ResourceNotFoundException {
+    /***
+     * Adds a user to the group. Requires admin privileges.
+     * @param id
+     * @param username of the user to invite
+     * @return
+     * @throws ResourceNotFoundException
+     */
+    @PostMapping("/{id}/add")
+    public ResponseEntity<?> addContributor(@PathVariable Long id, @RequestParam(name = "username") String username) throws ResourceNotFoundException {
         final User authenticatedUser = this.getAuthenticatedUser();
-
-        final Trip trip = tripService.getOne(id);
+        final Group group = groupService.getOne(id);
         final User invitee = userService.findUserByUsername(username);
-        if(trip.hasOwner(authenticatedUser)){
-            tripService.addContributorToTrip(trip, invitee);
+
+        if(group.hasOwner(authenticatedUser)){
+            groupService.addContributorToGroup(group, invitee);
             return new ResponseEntity<>("User invitation is pending on confirmation", HttpStatus.OK);
         }
         else{
@@ -78,14 +90,14 @@ public class TripController {
         }
     }
 
-    @DeleteMapping("/{id}/party/{username}")
-    public ResponseEntity<?> removeContributor(@PathVariable Long id, @PathVariable String username) throws ResourceNotFoundException {
+    @DeleteMapping("/{id}/remove")
+    public ResponseEntity<?> removeContributor(@PathVariable Long id, @RequestParam(name = "username") String username) throws ResourceNotFoundException {
         final User authenticatedUser = this.getAuthenticatedUser();
-
-        final Trip trip = tripService.getOne(id);
+        final Group group = groupService.getOne(id);
         final User contributor = userService.findUserByUsername(username);
-        if(trip.hasOwner(authenticatedUser)){
-            tripService.removeContributorFromTrip(trip, contributor);
+
+        if(group.hasOwner(authenticatedUser)){
+            groupService.removeContributorFromGroup(group, contributor);
             return new ResponseEntity<>("Contributor removed from trip", HttpStatus.OK);
         }
         else{
@@ -93,22 +105,29 @@ public class TripController {
         }
     }
 
+    /***
+     * Generates an invitation token for anybody to join the group.
+     * See /join endpoint.
+     * @param id
+     * @return
+     * @throws ResourceNotFoundException
+     */
     @PostMapping(path="/{id}/invite")
     public ResponseEntity<?> generateInvitationLink(@PathVariable Long id) throws ResourceNotFoundException {
         final User authenticatedUser = this.getAuthenticatedUser();
-        final Trip trip = tripService.getOne(id);
+        final Group group = groupService.getOne(id);
 
         String token = UUID.randomUUID().toString();
-        tripService.createInvitationToken(trip, token);
+        groupService.createInvitationToken(group, token);
 
         String confirmationUrl = ServletUriComponentsBuilder.fromCurrentContextPath().toUriString() + "/join?token=" + token;
         return ResponseEntity.ok(confirmationUrl);
     }
 
     @GetMapping(path="/join")
-    public ResponseEntity<?> joinTripViaInvitationLink(@RequestParam String token){
+    public ResponseEntity<?> joinGroupViaInvitationLink(@RequestParam String token){
 
-        InvitationToken invitationToken = tripService.getInvitationToken(token);
+        InvitationToken invitationToken = groupService.getInvitationToken(token);
         if (invitationToken == null) {
             return new ResponseEntity<>("Invalid token", HttpStatus.BAD_REQUEST);
         }
@@ -116,12 +135,12 @@ public class TripController {
             return new ResponseEntity<>("Expired token", HttpStatus.BAD_REQUEST);
         }
 
-        Trip trip = invitationToken.getTrip();
+        Group group = invitationToken.getGroup();
         final User invitee = this.getAuthenticatedUser();
-        tripService.addContributorToTrip(trip, invitee);
+        groupService.addContributorToGroup(group, invitee);
 
-        URI resourceLocation = ServletUriComponentsBuilder.fromPath("/api/v1/trips/{id}")
-                .buildAndExpand(trip.getTripId()).toUri();
+        URI resourceLocation = ServletUriComponentsBuilder.fromPath("/groups/{id}")
+                .buildAndExpand(group.getGroupId()).toUri();
 
         return ResponseEntity.ok(resourceLocation);
     }

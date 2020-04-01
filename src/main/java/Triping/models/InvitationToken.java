@@ -18,9 +18,9 @@ public class InvitationToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(targetEntity = Trip.class, fetch = FetchType.EAGER)
-    @JoinColumn(nullable = false, name = "trip_id", foreignKey = @ForeignKey(name = "FK_JOIN_TRIP"))
-    private Trip trip;
+    @OneToOne(targetEntity = Group.class, fetch = FetchType.EAGER)
+    @JoinColumn(nullable = false, name = "group_id", foreignKey = @ForeignKey(name = "FK_JOIN_GROUP"))
+    private Group group;
 
     private String token;
     private Date expiryDate;
@@ -40,9 +40,9 @@ public class InvitationToken {
         this.expiryDate = calculateExpiryDate(EXPIRATION);
     }
 
-    public InvitationToken(final Trip trip, final String token) {
+    public InvitationToken(final Group group, final String token) {
         this(token);
-        this.trip = trip;
+        this.group = group;
     }
 
     private Date calculateExpiryDate(int expiryTimeInMinutes) {
@@ -76,7 +76,7 @@ public class InvitationToken {
         int result = 1;
         result = prime * result + ((expiryDate == null) ? 0 : expiryDate.hashCode());
         result = prime * result + ((token == null) ? 0 : token.hashCode());
-        result = prime * result + ((trip == null) ? 0 : trip.hashCode());
+        result = prime * result + ((group == null) ? 0 : group.hashCode());
         return result;
     }
 
@@ -86,7 +86,7 @@ public class InvitationToken {
         if (!(o instanceof InvitationToken)) return false;
         InvitationToken that = (InvitationToken) o;
         return id.equals(that.id) &&
-                trip.equals(that.trip) &&
+                group.equals(that.group) &&
                 token.equals(that.token);
     }
 

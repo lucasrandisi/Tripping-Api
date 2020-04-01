@@ -44,29 +44,11 @@ public class User implements UserDetails {
 
     @OneToMany(mappedBy = "owner")
     @JsonIgnoreProperties("owner")
-    private List<Trip> ownedTrips;
+    private List<Group> ownedGroups;
 
-    @OneToMany(mappedBy="owner", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Itinerary> ownedItineraries;
-
-    @OneToMany(mappedBy = "owner", cascade=CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Marker> customMarkers;
-
-    @ManyToMany()
-    @JoinTable(name = "users_interests", joinColumns = @JoinColumn(name = "interest_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    @JsonBackReference
-    private Set<Interest> userInterests;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<TripParty> tripParties;
-
-    @ManyToMany
-    @JoinTable(name = "saved_markers", joinColumns = @JoinColumn(name = "marker_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<Marker> savedMarkers;
-
-    @ManyToMany
-    @JoinTable(name = "saved_trips", joinColumns = @JoinColumn(name = "trip_id"), inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private List<Marker> savedTrips;
+    @OneToMany(mappedBy = "creator")
+    @JsonIgnoreProperties("creator")
+    private List<Post> createdPosts;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -114,14 +96,6 @@ public class User implements UserDetails {
 
     public void removeFollower(User user) {
         followers.remove(this);
-    }
-
-    public boolean addInterest(Interest interest) {
-        return userInterests.add(interest);
-    }
-
-    public boolean removeInterest(Interest interest) {
-        return userInterests.remove(interest);
     }
 
     @Override
