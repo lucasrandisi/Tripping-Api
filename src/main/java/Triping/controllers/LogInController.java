@@ -37,7 +37,7 @@ public class LogInController {
                 return new ResponseEntity<>("Usuario loggeado", HttpStatus.OK);
         }
         else{
-                return new ResponseEntity<>("Contraseña incorrecta", HttpStatus.BAD_REQUEST);
+                return new ResponseEntity<>("Contraseña incorrecta", HttpStatus.UNAUTHORIZED);
         }
     }
 
